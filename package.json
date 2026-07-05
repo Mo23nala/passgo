@@ -1,0 +1,34 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mo23nala/passgo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Mo23nala/passgo/issues"
+  },
+  "homepage": "https://github.com/Mo23nala/passgo#readme",
+  "dependencies": {
+    "@types/libsodium-wrappers": "^0.7.14",
+    "better-sqlite3": "^12.11.1",
+    "libsodium-wrappers": "^0.8.4",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^26.1.0",
+    "argon2": "^0.44.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  }
+}

@@ -15,7 +15,7 @@
 - **Mobile UI**: React Native `0.86.0`
 - **State Management**: Zustand `5.0.14`
 - **Cryptography**: WebCrypto API & libsodium (libsodium-wrappers `0.8.4`)
-- **Database (Local)**: SQLite `5.1.1` / IndexedDB (Web)
+- **Database (Local)**: SQLite `5.1.1` (better-sqlite3 `12.11.1`) / IndexedDB (Web)
 - **Build Tooling**: Vite `8.1.3` (Web), Expo `@expo/cli 57.0.4` (Mobile), Tauri CLI `@tauri-apps/cli 2.11.4` (Desktop)
 
 *Note: All package versions verified against official npm sources using shell commands for the current system date (2026-07).*
@@ -78,9 +78,9 @@
 
 - **Goal**: Implement Goal 1 (Local Vault Initialization) & Goal 2 (Item Creation).
 - **Deliverables**:
-  - `core/crypto/` module with Argon2id and AES-256-GCM.
-  - Local SQLite database schemas for Vault and Items.
-  - Zustand state slice for unlocked vault session.
+  - ~~`core/crypto/` module with Argon2id and AES-256-GCM.~~
+  - ~~Local SQLite database schemas for Vault and Items.~~
+  - ~~Zustand state slice for unlocked vault session.~~
 
 ### Phase 2: User Interface & Platform Integration
 
