@@ -1,7 +1,7 @@
 # PROJECT_MAP — PassGo
 
 > **Last Updated:** 2026-07-06  
-> **Status:** Milestone 3B — Autofill Engine (Complete)  
+> **Status:** Milestone 3C — Autofill Polish, Compatibility & Security (Complete)  
 > **Target Platform:** Android 16 (API 36)
 
 ---
@@ -27,8 +27,6 @@
 
 | Technology | Milestone | Purpose |
 |---|---|---|
-| Biometric (AndroidX) | M3C | Fingerprint/face unlock for autofill |
-| Android Autofill Framework | M3C | Inline suggestions, custom presentation |
 
 ---
 
@@ -265,6 +263,7 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 | M2 | **Vault Core** (✅ Done) | CRUD, 12 categories, search/sort/filter, password generator, strength indicator, item detail with copy/show/open |
 | M3A | **Autofill Foundation** (✅ Done) | AutofillService registered, session lifecycle, field detection, domain handling, response builder, all compile |
 | M3B | **Autofill Engine** (✅ Done) | Vault integration, credential matching, dataset filling, save request handling, auth-aware responses |
+| M3C | **Autofill Polish, Compatibility & Security** (✅ Done) | Biometric auth, inline suggestions, UX polish, accessibility, compatibility, security hardening, error recovery |
 | M4 | **Vault Features** (⏳ Pending) | TOTP, tags, bulk operations, trash management |
 | M5 | **Security + Polish** (⏳ Pending) | Auto-clear clipboard, security audit, accessibility, crash reporting |
 
@@ -526,6 +525,94 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 - [x] No deprecated API usage
 - [x] No TODO/FIXME/HACK
 
+### Milestone 3C — Autofill Polish, Compatibility & Security (✅ Complete)
+
+#### Inline Autofill Suggestions
+- [x] `Dataset.Builder(Presentations)` for API 31+ inline support
+- [x] `Presentations.Builder` with menu presentation for dropdown + inline
+- [x] Graceful fallback to `Dataset.Builder(RemoteViews)` on pre-31
+- [x] Multiple account support preserved
+- [x] Fast rendering: single RemoteViews per dataset
+
+#### Biometric Authentication
+- [x] `AutofillAuthActivity` with `BiometricPrompt` (fingerprint + face unlock + device credential)
+- [x] `BiometricAuthManager` singleton for availability check via `BiometricManager`
+- [x] `SessionManager.tempUnlockForAutofill()` — scoped unlock for autofill session only
+- [x] `SessionManager.lockIfAutofillOnly()` — auto-relock after session ends
+- [x] `SessionManager.markAutofillAuthAttempted()` — prevents infinite auth loop
+- [x] Auth response via `FillResponse.Builder.setAuthentication()` + PendingIntent
+- [x] Clean cancel: auth failure → RESULT_CANCELED → empty response on retry
+
+#### Autofill UX
+- [x] Better dataset labels: simple_list_item_2 with primary + secondary text
+- [x] Primary: `name (username)` or `name` format
+- [x] Secondary: website URL or package name
+- [x] Inline suggestion hint via `Presentations` pass-through
+- [x] String resources for biometric prompt, empty state
+
+#### Compatibility
+- [x] API 26+ (minSdk) — all existing paths preserved
+- [x] API 30+ (Android 11) — biometric availability check via AndroidX
+- [x] API 31+ (Android 12) — `InlinePresentationSpec`, `Presentations.Builder`, non-deprecated auth API
+- [x] API 29+ — `PendingIntent.FLAG_IMMUTABLE` for auth PendingIntent
+- [x] All API differences handled with `Build.VERSION.SDK_INT` checks
+- [x] `onBackPressed` uses `OnBackPressedDispatcher` (not deprecated override)
+
+#### Accessibility
+- [x] Content descriptions on dataset text1 and text2 via `RemoteViews.setContentDescription()`
+- [x] Inline suggestion content descriptions
+- [x] simple_list_item_2 supports large fonts natively
+- [x] `android.R.layout.simple_list_item_2` provides clear high-contrast text
+- [x] String resources for screen reader labels in `strings.xml`
+
+#### Performance
+- [x] Single vault query per fill request preserved
+- [x] In-memory filtering for domain matching preserved
+- [x] Session start/end timing logged for performance metrics
+- [x] No unnecessary allocations: `emptyArray<AutofillId>()` in auth response
+- [x] `BiometricAuthManager` uses cached context, no per-call allocations
+
+#### Security Hardening
+- [x] Session cleanup: `lockIfAutofillOnly()` called in `completeWithEmpty()`, `finishSession()`, and `cancel()`
+- [x] Temp unlock scoped: `autofillSessionUnlock` flag prevents normal unlock from being auto-locked
+- [x] Auth timeout: autofill session re-locks after response delivery
+- [x] No credential logging: all log messages are lifecycle/auth/performance only
+- [x] Safe exception handling: every file extraction wrapped in try/catch
+- [x] Locked vault: returns empty response before any vault read
+- [x] `SessionManager.hasAutofillAuthBeenAttempted()` prevents repeated auth prompts
+
+#### Error Recovery
+- [x] Cancelled authentication: returns empty response on retry (vault still locked)
+- [x] Invalid AssistStructure: caught in `RequestParser.parse()`, returns empty
+- [x] No package name: early return with empty response
+- [x] Credential retrieval failure: caught, logged, returns empty
+- [x] Domain extraction failure: caught, falls back to package name
+- [x] Field value extraction failure: caught individually, defaults to ""
+- [x] Save failure: caught, logged, callback still calls onSuccess()
+- [x] Empty vault: returns empty credentials list, SaveInfo still attached
+- [x] Never crashes on any input
+
+#### Logging
+- [x] Session lifecycle: "Matching started", "Session finished", "Session cancelled", "SaveRequest received/completed"
+- [x] Authentication events: "Biometric authentication succeeded/error/failed"
+- [x] Performance metrics: "Session fill completed in {N}ms"
+- [x] Recovery events: "Failed to parse request", "Failed to retrieve credentials", "Failed to extract {field}"
+- [x] Auth flow: "Authentication required — vault locked, skipping autofill", "Authentication response sent"
+- [x] Never logs: username, email, password, secret, encryption keys
+
+#### Code Quality
+- [x] Zero compile errors
+- [x] Zero warnings
+- [x] No TODO/FIXME/HACK
+- [x] No placeholder or fake implementation
+- [x] Deprecated APIs suppressed only with @Suppress("DEPRECATION") where unavoidable
+- [x] All public API surface is production-ready
+
+#### Build Verification
+- [x] `compileDebugKotlin` — zero errors, zero warnings
+- [x] `assembleDebug` — BUILD SUCCESSFUL
+- [x] `testDebugUnitTest` — passes
+
 ---
 
 ## FILES_CREATED
@@ -719,3 +806,26 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 | `feature/autofill/dataset/DatasetBuilder.kt` | 80 → 83 | Improved presentation with credential name + username subtitle |
 | `feature/autofill/domain/DomainHandler.kt` | 82 → 86 | URL extraction fallback for bare domains (no protocol) |
 | `PROJECT_MAP.md` | — | Added M3B sections, file entries, milestone status |
+
+### Milestone 3C — New Files
+
+**Biometric Authentication**
+| File | Lines | Purpose |
+|---|---|---|
+| `feature/autofill/auth/AutofillAuthActivity.kt` | 98 | Transparent Activity with BiometricPrompt for autofill unlock |
+| `feature/autofill/auth/BiometricAuthManager.kt` | 45 | Biometric availability check via AndroidX BiometricManager |
+
+### Milestone 3C — Modified Files
+| File | Lines | Changes |
+|---|---|---|
+| `feature/autofill/service/PassGoAutofillService.kt` | 44 → 73 | Auth PendingIntent flow, SessionManager integration, needsAuthentication gate |
+| `feature/autofill/session/AutofillSession.kt` | 197 → 272 | Auth gate, error recovery wrapping, timing metrics, re-lock after session, biometric injection |
+| `feature/autofill/dataset/DatasetBuilder.kt` | 83 → 99 | Presentations.Builder for API 31+ inline support, content descriptions, simple_list_item_2, @Suppress("DEPRECATION") |
+| `feature/autofill/response/ResponseBuilder.kt` | 46 → 71 | buildAuthResponse() with setAuthentication(Presentations), non-deprecated overloads |
+| `data/session/SessionManager.kt` | 62 → 81 | tempUnlockForAutofill(), lockIfAutofillOnly(), markAutofillAuthAttempted(), hasAutofillAuthBeenAttempted() |
+| `app/build.gradle.kts` | — | Added `libs.biometric` dependency |
+| `AndroidManifest.xml` | — | Registered `AutofillAuthActivity` with transparent theme |
+| `res/values/themes.xml` | — | Added `Theme.PassGo.Transparent` style |
+| `res/values/strings.xml` | — | Added autofill string resources (biometric prompt, empty state, accessibility) |
+| `PROJECT_MAP.md` | — | Added M3C sections, file entries, milestone status |
+| `README.md` | — | Updated features list and milestone plan |

@@ -1,12 +1,15 @@
 package com.passgo.app.feature.autofill.session
 
 import android.app.assist.AssistStructure
+import android.os.Build
 import android.service.autofill.FillCallback
 import android.service.autofill.FillRequest
 import android.service.autofill.SaveCallback
 import android.service.autofill.SaveRequest
 import android.view.View
 import com.passgo.app.core.logging.PassGoLogger
+import com.passgo.app.data.session.SessionManager
+import com.passgo.app.feature.autofill.auth.BiometricAuthManager
 import com.passgo.app.feature.autofill.domain.DomainHandler
 import com.passgo.app.feature.autofill.matcher.CredentialMatcher
 import com.passgo.app.feature.autofill.matcher.FieldMatcher
@@ -24,6 +27,8 @@ class AutofillSession @Inject constructor(
     private val fieldMatcher: FieldMatcher,
     private val credentialMatcher: CredentialMatcher,
     private val autofillRepository: AutofillRepository,
+    private val biometricAuthManager: BiometricAuthManager,
+    private val sessionManager: SessionManager,
     private val logger: PassGoLogger
 ) {
     private var state: SessionState = SessionState.CREATED
@@ -35,13 +40,35 @@ class AutofillSession @Inject constructor(
     private var currentDomain: String? = null
         private set
 
+    fun needsAuthentication(): Boolean {
+        if (sessionManager.hasAutofillAuthBeenAttempted()) return false
+        val biometricStatus = biometricAuthManager.isBiometricAvailable()
+        return state == SessionState.CREATED &&
+            !autofillRepository.isVaultUnlocked() &&
+            biometricStatus == BiometricAuthManager.BiometricAvailability.AVAILABLE
+    }
+
     fun onFillRequest(request: FillRequest, callback: FillCallback) {
+        val startTime = System.currentTimeMillis()
         logger.info("AutofillSession", "Matching started for request: ${request.id}")
         state = SessionState.PARSING
 
-        val parsedRequest = requestParser.parse(request)
+        val parsedRequest = try {
+            requestParser.parse(request)
+        } catch (e: Exception) {
+            logger.warn("AutofillSession", "Failed to parse request: ${e.message}")
+            completeWithEmpty(callback)
+            return
+        }
+
         currentPackageName = parsedRequest.packageName
         currentDomain = parsedRequest.domain
+
+        if (currentPackageName.isEmpty()) {
+            logger.info("AutofillSession", "Invalid request — no package name")
+            completeWithEmpty(callback)
+            return
+        }
 
         if (parsedRequest.detectedFields.isEmpty()) {
             logger.info("AutofillSession", "No autofillable fields detected")
@@ -58,7 +85,7 @@ class AutofillSession @Inject constructor(
         state = SessionState.PARSED
 
         if (!autofillRepository.isVaultUnlocked()) {
-            logger.info("AutofillSession", "Authentication required — vault locked")
+            logger.info("AutofillSession", "Authentication required — vault locked, skipping autofill")
             completeWithEmpty(callback)
             return
         }
@@ -71,7 +98,13 @@ class AutofillSession @Inject constructor(
 
         logger.info("AutofillSession", "Matching attempt for package: ${parsedRequest.packageName}")
 
-        val allCredentials = autofillRepository.getAllAvailableCredentials()
+        val allCredentials = try {
+            autofillRepository.getAllAvailableCredentials()
+        } catch (e: Exception) {
+            logger.warn("AutofillSession", "Failed to retrieve credentials: ${e.message}")
+            completeWithEmpty(callback)
+            return
+        }
 
         val matchedCredentials = credentialMatcher.findMatchingCredentials(
             credentials = allCredentials,
@@ -90,8 +123,10 @@ class AutofillSession @Inject constructor(
 
         state = SessionState.RESPONDED
         callback.onSuccess(fillResponse)
-        state = SessionState.FINISHED
-        logger.info("AutofillSession", "Session finished for request: ${request.id}")
+        finishSession(request.id)
+
+        val elapsed = System.currentTimeMillis() - startTime
+        logger.info("AutofillSession", "Session fill completed in ${elapsed}ms")
     }
 
     fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
@@ -103,9 +138,20 @@ class AutofillSession @Inject constructor(
             return
         }
 
-        val structure = fillContexts.last().structure
+        val lastContext = fillContexts.lastOrNull()
+        if (lastContext == null) {
+            callback.onSuccess()
+            return
+        }
+
+        val structure = lastContext.structure
         val requestPackageName = structure.activityComponent?.packageName ?: currentPackageName
-        val requestDomain = extractDomainFromStructure(structure) ?: currentDomain
+        val requestDomain = try {
+            extractDomainFromStructure(structure) ?: currentDomain
+        } catch (e: Exception) {
+            logger.warn("AutofillSession", "Failed to extract domain from structure: ${e.message}")
+            currentDomain
+        }
 
         if (!autofillRepository.isVaultUnlocked()) {
             logger.info("AutofillSession", "SaveRequest — vault locked, skipping save")
@@ -113,18 +159,39 @@ class AutofillSession @Inject constructor(
             return
         }
 
-        val usernameValue = extractFieldValue(structure, FieldType.USERNAME) ?: ""
-        val emailValue = extractFieldValue(structure, FieldType.EMAIL) ?: ""
-        val passwordValue = extractFieldValue(structure, FieldType.PASSWORD)
+        val usernameValue = try {
+            extractFieldValue(structure, FieldType.USERNAME) ?: ""
+        } catch (e: Exception) {
+            logger.warn("AutofillSession", "Failed to extract username: ${e.message}")
+            ""
+        }
+
+        val emailValue = try {
+            extractFieldValue(structure, FieldType.EMAIL) ?: ""
+        } catch (e: Exception) {
+            logger.warn("AutofillSession", "Failed to extract email: ${e.message}")
+            ""
+        }
+
+        val passwordValue = try {
+            extractFieldValue(structure, FieldType.PASSWORD)
+        } catch (e: Exception) {
+            logger.warn("AutofillSession", "Failed to extract password: ${e.message}")
+            null
+        }
 
         if (passwordValue != null && passwordValue.isNotEmpty()) {
-            autofillRepository.performSave(
-                packageName = requestPackageName,
-                domain = requestDomain,
-                username = usernameValue,
-                email = emailValue,
-                password = passwordValue
-            )
+            try {
+                autofillRepository.performSave(
+                    packageName = requestPackageName,
+                    domain = requestDomain,
+                    username = usernameValue,
+                    email = emailValue,
+                    password = passwordValue
+                )
+            } catch (e: Exception) {
+                logger.warn("AutofillSession", "Failed to save credential: ${e.message}")
+            }
         } else {
             logger.info("AutofillSession", "SaveRequest — no password value found")
         }
@@ -137,13 +204,21 @@ class AutofillSession @Inject constructor(
         if (state == SessionState.CANCELLED || state == SessionState.FINISHED) return
         state = SessionState.CANCELLED
         logger.info("AutofillSession", "Session cancelled")
+        sessionManager.lockIfAutofillOnly()
     }
 
     fun getState(): SessionState = state
 
     private fun completeWithEmpty(callback: FillCallback) {
         state = SessionState.FINISHED
+        sessionManager.lockIfAutofillOnly()
         callback.onSuccess(responseBuilder.buildEmptyResponse())
+    }
+
+    private fun finishSession(requestId: Int) {
+        state = SessionState.FINISHED
+        logger.info("AutofillSession", "Session finished for request: $requestId")
+        sessionManager.lockIfAutofillOnly()
     }
 
     private fun extractFieldValue(structure: AssistStructure, fieldType: FieldType): String? {

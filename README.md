@@ -2,7 +2,7 @@
 
 A professional Android password manager with encrypted local storage.
 
-> **Status:** Milestone 2 — Vault Core (Complete)
+> **Status:** Milestone 3C — Autofill Polish, Compatibility & Security (Complete)
 > **Target:** Android 16 (API 36), APK distribution
 
 ## Architecture
@@ -38,6 +38,14 @@ Feature-first, single-module Android app built with:
 | Password strength indicator | ✅ |
 | Item detail with copy, show/hide, open URL | ✅ |
 | 12 item categories (Google, Email, Banking, etc.) | ✅ |
+| Android Autofill Framework service | ✅ |
+| Credential matching by domain / package | ✅ |
+| Save request handling (new + update existing) | ✅ |
+| Multiple account autofill | ✅ |
+| Locked vault protection | ✅ |
+| Inline suggestions (Android 12+) | ✅ |
+| Biometric authentication for autofill | ✅ |
+| Accessibility (content descriptions, screen reader support) | ✅ |
 
 ## Screens
 
@@ -73,6 +81,8 @@ Feature-first, single-module Android app built with:
 | M0 | Project Foundation | ✅ Complete |
 | M1 | Core Foundation | ✅ Complete |
 | M2 | Vault Core (CRUD, categories, search/sort/filter, generator, strength, detail) | ✅ Complete |
-| M3 | Vault Features | ⏳ Pending |
-| M4 | Autofill + Export | ⏳ Pending |
-| M5 | Security + Polish | ⏳ Pending |
+| M3A | Autofill Foundation | ✅ Complete |
+| M3B | Autofill Engine | ✅ Complete |
+| M3C | Autofill Polish, Compatibility & Security | ✅ Complete |
+| M4 | Vault Features (TOTP, tags, bulk, trash) | ⏳ Pending |
+| M5 | Security + Polish (clipboard, audit, accessibility) | ⏳ Pending |

@@ -22,18 +22,42 @@ class SessionManager @Inject constructor(
 
     private var unlockedSince: Long = 0L
     private var autoLockTimeout: Long = DEFAULT_AUTO_LOCK_MS
+    private var autofillSessionUnlock: Boolean = false
+    private var autofillAuthAttempted: Boolean = false
 
     fun isUnlocked(): Boolean = _sessionState.value == SessionState.UNLOCKED
 
     fun unlock() {
         unlockedSince = System.currentTimeMillis()
         _sessionState.value = SessionState.UNLOCKED
+        autofillSessionUnlock = false
         logger.info("SessionManager", "Session unlocked")
     }
+
+    fun tempUnlockForAutofill() {
+        unlockedSince = System.currentTimeMillis()
+        _sessionState.value = SessionState.UNLOCKED
+        autofillSessionUnlock = true
+        autofillAuthAttempted = true
+        logger.info("SessionManager", "Temporary autofill unlock")
+    }
+
+    fun markAutofillAuthAttempted() {
+        autofillAuthAttempted = true
+    }
+
+    fun hasAutofillAuthBeenAttempted(): Boolean = autofillAuthAttempted
 
     fun lock() {
         _sessionState.value = SessionState.LOCKED
         unlockedSince = 0L
+        autofillSessionUnlock = false
+    }
+
+    fun lockIfAutofillOnly() {
+        if (autofillSessionUnlock) {
+            lock()
+        }
     }
 
     fun setAutoLockTimeout(seconds: Int) {

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PassGo</string>
+
+    <!-- Autofill UX -->
+    <string name="autofill_biometric_title">Unlock PassGo</string>
+    <string name="autofill_biometric_subtitle">Authenticate to autofill your credentials</string>
+    <string name="autofill_empty_state">No saved credentials for this app</string>
+    <string name="autofill_locked_state">Vault locked — tap to unlock</string>
+    <string name="autofill_dataset_icon_description">%s favicon</string>
 </resources>

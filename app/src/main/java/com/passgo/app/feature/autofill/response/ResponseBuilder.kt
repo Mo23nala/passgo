@@ -1,7 +1,10 @@
 package com.passgo.app.feature.autofill.response
 
+import android.app.PendingIntent
+import android.os.Build
 import android.service.autofill.FillResponse
-import android.service.autofill.SaveInfo
+import android.service.autofill.Presentations
+import android.view.autofill.AutofillId
 import com.passgo.app.feature.autofill.dataset.DatasetBuilder
 import com.passgo.app.feature.autofill.model.AutofillCredential
 import com.passgo.app.feature.autofill.model.AutofillField
@@ -32,6 +35,28 @@ class ResponseBuilder @Inject constructor(
             passwordField = passwordField
         )
         responseBuilder.setSaveInfo(saveInfo)
+
+        return responseBuilder.build()
+    }
+
+    fun buildAuthResponse(pendingIntent: PendingIntent): FillResponse {
+        val responseBuilder = FillResponse.Builder()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val presentations = Presentations.Builder().build()
+            responseBuilder.setAuthentication(
+                emptyArray<AutofillId>(),
+                pendingIntent.intentSender,
+                presentations
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            responseBuilder.setAuthentication(
+                emptyArray<AutofillId>(),
+                pendingIntent.intentSender,
+                null as android.widget.RemoteViews?
+            )
+        }
 
         return responseBuilder.build()
     }

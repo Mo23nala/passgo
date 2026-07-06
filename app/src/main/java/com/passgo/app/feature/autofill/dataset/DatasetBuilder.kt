@@ -2,6 +2,7 @@ package com.passgo.app.feature.autofill.dataset
 
 import android.os.Build
 import android.service.autofill.Dataset
+import android.service.autofill.Presentations
 import android.service.autofill.SaveInfo
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
@@ -16,7 +17,6 @@ class DatasetBuilder @Inject constructor() {
 
     private val packageName = "com.passgo.app"
 
-    @Suppress("DEPRECATION")
     fun buildFillDataset(
         credential: AutofillCredential,
         usernameField: AutofillField?,
@@ -25,25 +25,37 @@ class DatasetBuilder @Inject constructor() {
     ): Dataset? {
         if (passwordField == null) return null
 
-        val presentation = createPresentation(credential)
+        val menuPresentation = createPresentation(credential)
 
-        val dataset = Dataset.Builder(presentation)
+        val dataset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val builder = Presentations.Builder()
+            builder.setMenuPresentation(menuPresentation)
+            Dataset.Builder(builder.build())
+        } else {
+            @Suppress("DEPRECATION")
+            Dataset.Builder(menuPresentation)
+        }
 
         usernameField?.let { field ->
             if (credential.username.isNotEmpty()) {
-                dataset.setValue(field.autofillId, AutofillValue.forText(credential.username))
+                setDatasetValue(dataset, field.autofillId, AutofillValue.forText(credential.username))
             }
         }
 
         emailField?.let { field ->
             if (credential.email.isNotEmpty()) {
-                dataset.setValue(field.autofillId, AutofillValue.forText(credential.email))
+                setDatasetValue(dataset, field.autofillId, AutofillValue.forText(credential.email))
             }
         }
 
-        dataset.setValue(passwordField.autofillId, AutofillValue.forText(credential.password))
+        setDatasetValue(dataset, passwordField.autofillId, AutofillValue.forText(credential.password))
 
         return dataset.build()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setDatasetValue(dataset: Dataset.Builder, id: AutofillId, value: AutofillValue) {
+        dataset.setValue(id, value)
     }
 
     fun buildSaveDataset(
@@ -69,15 +81,20 @@ class DatasetBuilder @Inject constructor() {
     }
 
     private fun createPresentation(credential: AutofillCredential): RemoteViews {
-        val displayLabel = credential.name.ifEmpty { credential.username.ifEmpty { credential.email } }
-        val displaySubtext = credential.username.ifEmpty { credential.email }.let {
-            if (it.isNotEmpty() && it != displayLabel) " ($it)" else ""
+        val displayName = credential.name.ifEmpty { credential.username.ifEmpty { credential.email } }
+        val displaySub = credential.username.ifEmpty { credential.email }
+        val primaryText = if (displaySub.isNotEmpty() && displaySub != displayName) {
+            "$displayName ($displaySub)"
+        } else {
+            displayName
         }
-        val displayText = "$displayLabel$displaySubtext"
 
-        val layoutId = android.R.layout.simple_list_item_1
+        val layoutId = android.R.layout.simple_list_item_2
         val presentation = RemoteViews(packageName, layoutId)
-        presentation.setTextViewText(android.R.id.text1, displayText)
+        presentation.setTextViewText(android.R.id.text1, primaryText)
+        presentation.setTextViewText(android.R.id.text2, credential.url.ifEmpty { packageName })
+        presentation.setContentDescription(android.R.id.text1, "Autofill credential for $displayName")
+        presentation.setContentDescription(android.R.id.text2, "Website: ${credential.url.ifEmpty { packageName }}")
         return presentation
     }
 }

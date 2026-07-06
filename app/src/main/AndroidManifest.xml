@@ -38,6 +38,14 @@
                 android:resource="@xml/autofill_service_config" />
         </service>
 
+        <activity
+            android:name=".feature.autofill.auth.AutofillAuthActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PassGo.Transparent"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleTask" />
+
     </application>
 
 </manifest>
