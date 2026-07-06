@@ -8,6 +8,17 @@ import com.passgo.app.core.database.dao.TagDao
 import com.passgo.app.core.database.dao.VaultDao
 import com.passgo.app.core.database.dao.VaultItemDao
 import com.passgo.app.core.security.MasterKeyManager
+import com.passgo.app.data.repository.AttachmentRepository
+import com.passgo.app.data.repository.AttachmentRepositoryImpl
+import com.passgo.app.data.repository.FolderRepository
+import com.passgo.app.data.repository.FolderRepositoryImpl
+import com.passgo.app.data.repository.TagRepository
+import com.passgo.app.data.repository.TagRepositoryImpl
+import com.passgo.app.data.repository.VaultItemRepository
+import com.passgo.app.data.repository.VaultItemRepositoryImpl
+import com.passgo.app.data.repository.VaultRepository
+import com.passgo.app.data.repository.VaultRepositoryImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,30 +28,52 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DatabaseModule {
+abstract class DatabaseModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun providePassGoDatabase(
-        @ApplicationContext context: Context,
-        masterKeyManager: MasterKeyManager
-    ): PassGoDatabase {
-        val masterKey = masterKeyManager.getOrCreateMasterKey()
-        return PassGoDatabase.build(context, masterKey)
+    abstract fun bindVaultRepository(impl: VaultRepositoryImpl): VaultRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVaultItemRepository(impl: VaultItemRepositoryImpl): VaultItemRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFolderRepository(impl: FolderRepositoryImpl): FolderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTagRepository(impl: TagRepositoryImpl): TagRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAttachmentRepository(impl: AttachmentRepositoryImpl): AttachmentRepository
+
+    companion object {
+        @Provides
+        @Singleton
+        fun providePassGoDatabase(
+            @ApplicationContext context: Context,
+            masterKeyManager: MasterKeyManager
+        ): PassGoDatabase {
+            val masterKey = masterKeyManager.getOrCreateMasterKey()
+            return PassGoDatabase.build(context, masterKey)
+        }
+
+        @Provides
+        fun provideVaultDao(database: PassGoDatabase): VaultDao = database.vaultDao()
+
+        @Provides
+        fun provideVaultItemDao(database: PassGoDatabase): VaultItemDao = database.vaultItemDao()
+
+        @Provides
+        fun provideFolderDao(database: PassGoDatabase): FolderDao = database.folderDao()
+
+        @Provides
+        fun provideTagDao(database: PassGoDatabase): TagDao = database.tagDao()
+
+        @Provides
+        fun provideAttachmentDao(database: PassGoDatabase): AttachmentDao = database.attachmentDao()
     }
-
-    @Provides
-    fun provideVaultDao(database: PassGoDatabase): VaultDao = database.vaultDao()
-
-    @Provides
-    fun provideVaultItemDao(database: PassGoDatabase): VaultItemDao = database.vaultItemDao()
-
-    @Provides
-    fun provideFolderDao(database: PassGoDatabase): FolderDao = database.folderDao()
-
-    @Provides
-    fun provideTagDao(database: PassGoDatabase): TagDao = database.tagDao()
-
-    @Provides
-    fun provideAttachmentDao(database: PassGoDatabase): AttachmentDao = database.attachmentDao()
 }

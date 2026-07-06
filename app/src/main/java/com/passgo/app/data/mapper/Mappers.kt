@@ -7,11 +7,11 @@ import com.passgo.app.core.database.entity.VaultEntity
 import com.passgo.app.core.database.entity.VaultItemEntity
 import com.passgo.app.core.model.Attachment
 import com.passgo.app.core.model.Folder
-import com.passgo.app.core.model.ItemType
 import com.passgo.app.core.model.SyncStatus
 import com.passgo.app.core.model.Tag
 import com.passgo.app.core.model.Vault
 import com.passgo.app.core.model.VaultItem
+import com.passgo.app.core.model.VaultItemCategory
 
 fun VaultEntity.toDomain(): Vault = Vault(
     id = id,
@@ -39,9 +39,10 @@ fun VaultItemEntity.toDomain(): VaultItem = VaultItem(
     id = id,
     vaultId = vaultId,
     folderId = folderId,
-    type = ItemType.valueOf(type),
+    category = try { VaultItemCategory.valueOf(type) } catch (_: IllegalArgumentException) { VaultItemCategory.OTHER },
     name = name,
     username = username,
+    email = email,
     password = password,
     url = url,
     notes = notes,
@@ -57,9 +58,10 @@ fun VaultItem.toEntity(): VaultItemEntity = VaultItemEntity(
     id = id,
     vaultId = vaultId,
     folderId = folderId,
-    type = type.name,
+    type = category.name,
     name = name,
     username = username,
+    email = email,
     password = password,
     url = url,
     notes = notes,

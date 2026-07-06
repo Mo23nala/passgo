@@ -28,7 +28,7 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         TagItemCrossRef::class,
         AttachmentEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class PassGoDatabase : RoomDatabase() {
@@ -59,6 +59,7 @@ abstract class PassGoDatabase : RoomDatabase() {
                 DB_NAME
             )
                 .openHelperFactory(factory)
+                .addMigrations(*DatabaseMigrations.ALL_MIGRATIONS)
                 .build()
         }
 

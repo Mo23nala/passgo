@@ -14,6 +14,9 @@ interface VaultItemDao {
     @Query("SELECT COUNT(*) FROM vault_items WHERE deleted_at IS NULL")
     fun getActiveItemsCount(): Flow<Int>
 
+    @Query("SELECT * FROM vault_items WHERE id = :id")
+    fun getItemById(id: String): Flow<VaultItemEntity?>
+
     @Query("SELECT * FROM vault_items WHERE vault_id = :vaultId AND deleted_at IS NULL ORDER BY updated_at DESC")
     fun getActiveItems(vaultId: String): Flow<List<VaultItemEntity>>
 
@@ -32,10 +35,43 @@ interface VaultItemDao {
     @Query("""
         SELECT * FROM vault_items 
         WHERE vault_id = :vaultId AND deleted_at IS NULL 
-        AND (name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%')
+        AND (name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR email LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%')
         ORDER BY updated_at DESC
     """)
     fun searchItems(vaultId: String, query: String): Flow<List<VaultItemEntity>>
+
+    @Query("""
+        SELECT * FROM vault_items 
+        WHERE vault_id = :vaultId AND deleted_at IS NULL AND type = :type
+        AND (name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR email LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%')
+        ORDER BY updated_at DESC
+    """)
+    fun searchByType(vaultId: String, type: String, query: String): Flow<List<VaultItemEntity>>
+
+    @Query("""
+        SELECT * FROM vault_items 
+        WHERE vault_id = :vaultId AND deleted_at IS NULL AND favorite = 1
+        AND (name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR email LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%')
+        ORDER BY updated_at DESC
+    """)
+    fun searchFavorites(vaultId: String, query: String): Flow<List<VaultItemEntity>>
+
+    @Query("""
+        SELECT * FROM vault_items 
+        WHERE vault_id = :vaultId AND deleted_at IS NULL AND folder_id = :folderId
+        AND (name LIKE '%' || :query || '%' OR username LIKE '%' || :query || '%' OR email LIKE '%' || :query || '%' OR url LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%')
+        ORDER BY updated_at DESC
+    """)
+    fun searchByFolder(vaultId: String, folderId: String, query: String): Flow<List<VaultItemEntity>>
+
+    @Query("SELECT * FROM vault_items WHERE vault_id = :vaultId AND deleted_at IS NULL ORDER BY name ASC")
+    fun getActiveItemsSortedByName(vaultId: String): Flow<List<VaultItemEntity>>
+
+    @Query("SELECT * FROM vault_items WHERE vault_id = :vaultId AND deleted_at IS NULL ORDER BY created_at DESC")
+    fun getActiveItemsSortedByNewest(vaultId: String): Flow<List<VaultItemEntity>>
+
+    @Query("SELECT * FROM vault_items WHERE vault_id = :vaultId AND deleted_at IS NULL ORDER BY favorite DESC, updated_at DESC")
+    fun getActiveItemsSortedByFavorite(vaultId: String): Flow<List<VaultItemEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: VaultItemEntity)

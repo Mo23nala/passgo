@@ -4,9 +4,10 @@ data class VaultItem(
     val id: String,
     val vaultId: String,
     val folderId: String? = null,
-    val type: ItemType,
+    val category: VaultItemCategory,
     val name: String,
     val username: String = "",
+    val email: String = "",
     val password: String = "",
     val url: String = "",
     val notes: String = "",
@@ -17,14 +18,3 @@ data class VaultItem(
     val syncVersion: Int = 0,
     val syncStatus: SyncStatus = SyncStatus.SYNCED
 )
-
-enum class ItemType(val displayName: String) {
-    LOGIN("Login"),
-    NOTE("Secure Note"),
-    CREDIT_CARD("Credit Card"),
-    IDENTITY("Identity"),
-    WIFI("Wi-Fi"),
-    LICENSE("Software License"),
-    TOTP("Authenticator"),
-    CUSTOM("Custom")
-}

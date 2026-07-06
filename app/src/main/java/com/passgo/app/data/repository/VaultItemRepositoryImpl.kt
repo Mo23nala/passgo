@@ -3,8 +3,8 @@ package com.passgo.app.data.repository
 import com.passgo.app.core.database.dao.VaultItemDao
 import com.passgo.app.core.error.AppException
 import com.passgo.app.core.error.AppResult
-import com.passgo.app.core.model.ItemType
 import com.passgo.app.core.model.VaultItem
+import com.passgo.app.core.model.VaultItemCategory
 import com.passgo.app.data.mapper.toDomain
 import com.passgo.app.data.mapper.toEntity
 import kotlinx.coroutines.flow.Flow
@@ -20,8 +20,11 @@ class VaultItemRepositoryImpl @Inject constructor(
     override fun getActiveItems(vaultId: String): Flow<List<VaultItem>> =
         vaultItemDao.getActiveItems(vaultId).map { list -> list.map { it.toDomain() } }
 
-    override fun getByType(vaultId: String, type: ItemType): Flow<List<VaultItem>> =
-        vaultItemDao.getByType(vaultId, type.name).map { list -> list.map { it.toDomain() } }
+    override fun getItemById(id: String): Flow<VaultItem?> =
+        vaultItemDao.getItemById(id).map { it?.toDomain() }
+
+    override fun getByType(vaultId: String, category: VaultItemCategory): Flow<List<VaultItem>> =
+        vaultItemDao.getByType(vaultId, category.name).map { list -> list.map { it.toDomain() } }
 
     override fun getByFolder(folderId: String): Flow<List<VaultItem>> =
         vaultItemDao.getByFolder(folderId).map { list -> list.map { it.toDomain() } }
@@ -34,6 +37,24 @@ class VaultItemRepositoryImpl @Inject constructor(
 
     override fun searchItems(vaultId: String, query: String): Flow<List<VaultItem>> =
         vaultItemDao.searchItems(vaultId, query).map { list -> list.map { it.toDomain() } }
+
+    override fun searchByType(vaultId: String, type: VaultItemCategory, query: String): Flow<List<VaultItem>> =
+        vaultItemDao.searchByType(vaultId, type.name, query).map { list -> list.map { it.toDomain() } }
+
+    override fun searchFavorites(vaultId: String, query: String): Flow<List<VaultItem>> =
+        vaultItemDao.searchFavorites(vaultId, query).map { list -> list.map { it.toDomain() } }
+
+    override fun searchByFolder(vaultId: String, folderId: String, query: String): Flow<List<VaultItem>> =
+        vaultItemDao.searchByFolder(vaultId, folderId, query).map { list -> list.map { it.toDomain() } }
+
+    override fun getActiveItemsSortedByName(vaultId: String): Flow<List<VaultItem>> =
+        vaultItemDao.getActiveItemsSortedByName(vaultId).map { list -> list.map { it.toDomain() } }
+
+    override fun getActiveItemsSortedByNewest(vaultId: String): Flow<List<VaultItem>> =
+        vaultItemDao.getActiveItemsSortedByNewest(vaultId).map { list -> list.map { it.toDomain() } }
+
+    override fun getActiveItemsSortedByFavorite(vaultId: String): Flow<List<VaultItem>> =
+        vaultItemDao.getActiveItemsSortedByFavorite(vaultId).map { list -> list.map { it.toDomain() } }
 
     override suspend fun insert(item: VaultItem): AppResult<Unit> = runCatching {
         vaultItemDao.insert(item.toEntity())

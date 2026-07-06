@@ -39,6 +39,7 @@ data class VaultItemEntity(
     val type: String,
     val name: String,
     val username: String = "",
+    val email: String = "",
     val password: String = "",
     val url: String = "",
     val notes: String = "",

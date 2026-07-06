@@ -21,16 +21,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.passgo.app.data.session.SessionManager
 import com.passgo.app.feature.home.HomeScreen
 import com.passgo.app.feature.premium.PremiumScreen
 import com.passgo.app.feature.settings.SettingsScreen
 import com.passgo.app.feature.setup.SetupScreen
 import com.passgo.app.feature.unlock.UnlockScreen
+import com.passgo.app.feature.vault.AddEditItemScreen
+import com.passgo.app.feature.vault.ItemDetailScreen
 import com.passgo.app.feature.vault.VaultScreen
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
@@ -57,7 +61,8 @@ fun PassGoNavHost(sessionManager: SessionManager) {
         com.passgo.app.data.session.SessionManager.SessionState.UNLOCKED -> Screen.Home.route
     }
 
-    val showBottomBar = currentDestination?.route in bottomNavItems.map { it.route }
+    val bottomBarRoutes = bottomNavItems.map { it.route }
+    val showBottomBar = currentDestination?.route in bottomBarRoutes
 
     Scaffold(
         bottomBar = {
@@ -106,8 +111,49 @@ fun PassGoNavHost(sessionManager: SessionManager) {
                         }
                     })
                 }
-                composable(Screen.Home.route) { HomeScreen() }
-                composable(Screen.Vault.route) { VaultScreen() }
+                composable(Screen.Home.route) {
+                    HomeScreen(
+                        onAddItem = {
+                            navController.navigate("vault/add")
+                        }
+                    )
+                }
+                composable(Screen.Vault.route) {
+                    VaultScreen(
+                        onAddItem = { navController.navigate("vault/add") },
+                        onItemClick = { itemId -> navController.navigate("vault/detail/$itemId") }
+                    )
+                }
+                composable(
+                    route = "vault/add",
+                    arguments = emptyList()
+                ) {
+                    AddEditItemScreen(
+                        itemId = null,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                composable(
+                    route = "vault/detail/{itemId}",
+                    arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val itemId = backStackEntry.arguments?.getString("itemId") ?: return@composable
+                    ItemDetailScreen(
+                        itemId = itemId,
+                        onNavigateBack = { navController.popBackStack() },
+                        onEdit = { id -> navController.navigate("vault/edit/$id") }
+                    )
+                }
+                composable(
+                    route = "vault/edit/{itemId}",
+                    arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val itemId = backStackEntry.arguments?.getString("itemId") ?: return@composable
+                    AddEditItemScreen(
+                        itemId = itemId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
                 composable(Screen.Premium.route) { PremiumScreen() }
                 composable(Screen.Settings.route) { SettingsScreen() }
             }

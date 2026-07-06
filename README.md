@@ -2,7 +2,7 @@
 
 A professional Android password manager with encrypted local storage.
 
-> **Status:** Milestone 1 — Core Foundation (Complete)
+> **Status:** Milestone 2 — Vault Core (Complete)
 > **Target:** Android 16 (API 36), APK distribution
 
 ## Architecture
@@ -22,7 +22,7 @@ Feature-first, single-module Android app built with:
 ## Features
 
 | Feature | Status |
-|---|---|
+|---|---|---|
 | Encrypted local database (SQLCipher) | ✅ |
 | Master password creation with strength validation | ✅ |
 | Vault unlock with password verification | ✅ |
@@ -32,6 +32,12 @@ Feature-first, single-module Android app built with:
 | App settings (theme, auto-lock, version) | ✅ |
 | Logging infrastructure | ✅ |
 | Error handling (AppResult) | ✅ |
+| Vault item list with search, sort, filter | ✅ |
+| Add/edit vault items with category & folder | ✅ |
+| Password generation (crypto-strong) | ✅ |
+| Password strength indicator | ✅ |
+| Item detail with copy, show/hide, open URL | ✅ |
+| 12 item categories (Google, Email, Banking, etc.) | ✅ |
 
 ## Screens
 
@@ -40,7 +46,10 @@ Feature-first, single-module Android app built with:
 | Setup | `/setup` | Master password creation (first launch) |
 | Unlock | `/unlock` | Password verification (subsequent launches) |
 | Home | `/home` | Dashboard with stats, security status, tip |
-| Vault | `/vault` | Encrypted items list |
+| Vault | `/vault` | Item list with search, sort, filter, categories |
+| Add Item | `/vault/add` | Add new password item form |
+| Item Detail | `/vault/detail/{id}` | View/copy/show/open item details |
+| Edit Item | `/vault/edit/{id}` | Edit existing item |
 | Premium | `/premium` | Upgrade features |
 | Settings | `/settings` | Theme, auto-lock, app info |
 
@@ -63,7 +72,7 @@ Feature-first, single-module Android app built with:
 |---|---|---|
 | M0 | Project Foundation | ✅ Complete |
 | M1 | Core Foundation | ✅ Complete |
-| M2 | Vault CRUD | ⏳ Pending |
+| M2 | Vault Core (CRUD, categories, search/sort/filter, generator, strength, detail) | ✅ Complete |
 | M3 | Vault Features | ⏳ Pending |
 | M4 | Autofill + Export | ⏳ Pending |
 | M5 | Security + Polish | ⏳ Pending |

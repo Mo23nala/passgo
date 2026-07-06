@@ -34,6 +34,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun HomeScreen(
+    onAddItem: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val totalItems by viewModel.totalItems.collectAsState()
@@ -87,7 +88,7 @@ fun HomeScreen(
         }
 
         FloatingActionButton(
-            onClick = { },
+            onClick = onAddItem,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)

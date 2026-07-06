@@ -1,7 +1,7 @@
 # PROJECT_MAP — PassGo
 
 > **Last Updated:** 2026-07-06  
-> **Status:** Milestone 1 — Database + Cryptography Foundation (Complete)  
+> **Status:** Milestone 2 — Vault Core (Complete)  
 > **Target Platform:** Android 16 (API 36)
 
 ---
@@ -133,7 +133,7 @@ App → MasterKeyManager.getOrCreateMasterKey() → KeyStoreManager (KeyStore AE
 | `data.session` | Session state, auto-lock timeout | `SessionManager.kt` |
 | `data.settings` | Theme mode, auto-lock, language, security tips | `ThemeMode.kt`, `UserPreferences.kt` (DataStore) |
 | `feature.home` | Dashboard with stats, vault status, security tip, FAB | `HomeScreen.kt`, `HomeViewModel.kt` |
-| `feature.vault` | Vault item list (placeholder) | `VaultScreen.kt` |
+| `feature.vault` | Vault item list, add/edit form, item detail | `VaultScreen.kt`, `VaultViewModel.kt`, `AddEditItemScreen.kt`, `AddEditItemViewModel.kt`, `ItemDetailScreen.kt`, `ItemDetailViewModel.kt` |
 | `feature.premium` | Premium upgrade (placeholder) | `PremiumScreen.kt` |
 | `feature.settings` | Theme selection, auto-lock timer, app version | `SettingsScreen.kt`, `SettingsViewModel.kt` |
 | `feature.setup` | Master password creation | `SetupScreen.kt`, `SetupViewModel.kt` |
@@ -251,7 +251,7 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 |---|---|---|
 | M0 | **Foundation** (✅ Done) | `gradlew assembleDebug` succeeds; 4 placeholder screens render |
 | M1 | **Database + Cryptography** (✅ Done) | Room + SQLCipher DB; KeyStore key protection; repository layer; tests pass |
-| M2 | Vault CRUD | Create, read, update, delete vault items; unlock screens |
+| M2 | Vault Core | ✅ Complete — CRUD, 12 categories, search/sort/filter, password generator, strength indicator, item detail with copy/show/open |
 | M3 | Vault Features | Password generator, TOTP, categories, search |
 | M4 | Autofill + Export | Android Autofill Service; CSV/JSON export/import |
 | M5 | Security + Polish | Auto-clear clipboard; security audit; accessibility |
@@ -333,6 +333,58 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 - [x] Gradle sync succeeds
 - [x] No deprecated API usage in new code
 - [x] `error_prone_annotations` dependency added for Hilt 2.60 + KSP 2.3.9 compat
+
+### Milestone 2 — Vault Core (✅ Complete)
+
+#### Data Layer
+- [x] `VaultItemCategory` enum (12 categories with display names)
+- [x] `VaultItem` model: replaced `ItemType` with `VaultItemCategory`, added `email` field
+- [x] `VaultItemEntity`: added `email` column
+- [x] `DatabaseMigrations`: 1→2 migration adds `email` column
+- [x] `PassGoDatabase`: version bumped to 2 with migration registered
+- [x] `VaultItemDao`: 16 query methods — search by text/type/folder/favorites, sorted by name/newest/favorite
+- [x] `Mappers.kt`: updated for VaultItemCategory + email mapping
+- [x] `VaultItemRepository` + impl: getById, searchByType/Favorites/Folder, sorted queries
+- [x] `Hilt DI`: `DatabaseModule` with `@Binds` for all 5 repository interfaces
+
+#### Feature — Vault Screen
+- [x] `VaultScreen` + `VaultViewModel`: search text, sort dropdown (RECENT/NAME/FAVORITE), category filter chips (first 6), folder filter chips, favorites toggle, empty state with contextual messages, delete confirmation dialog, FAB
+- [x] Reactive multi-filter: `combine(5 flows).flatMapLatest` → 9 query combinations
+- [x] `ItemCard` composable: category icon, name, username, category label, favorite star
+
+#### Feature — Add/Edit Form
+- [x] `AddEditItemScreen` + `AddEditItemViewModel`: full form with name, username, email, password, website, notes, category dropdown, folder dropdown, favorite checkbox
+- [x] Input validation: name and password required, errors displayed inline
+- [x] Password generator integration: 20-char default with uppercase, lowercase, digits, symbols, no ambiguous
+- [x] Password strength indicator: reactive bar with label
+- [x] Password visibility toggle, save/update with loading spinner
+
+#### Feature — Item Detail
+- [x] `ItemDetailScreen` + `ItemDetailViewModel`: displays all fields with copy buttons for username, email, password, website
+- [x] Password show/hide toggle
+- [x] Open website via `ACTION_VIEW` intent with safe URL handling
+- [x] Edit/delete actions with delete confirmation dialog
+- [x] Snackbar feedback on copy actions
+
+#### Core Components
+- [x] `PasswordGenerator`: `SecureRandom` with configurable options, `CharArray` zero-fill
+- [x] `PasswordStrengthIndicator`: `LinearProgressIndicator` colored by strength level
+- [x] `PasswordStrengthSuggestions`: actionable improvement text per `ValidationError`
+
+#### Navigation
+- [x] Routes: `vault/add`, `vault/detail/{itemId}`, `vault/edit/{itemId}`
+- [x] Home FAB navigates to add item
+- [x] Vault item click → detail, edit button → edit form
+
+#### Build Verification
+- [x] `assembleDebug` — zero errors, zero warnings
+- [x] `testDebugUnitTest` — passes
+- [x] Gradle sync succeeds
+- [x] No deprecated API usage
+- [x] No TODO/FIXME/HACK in new code
+- [x] AppResult consistently checked in all ViewModels
+- [x] Sensitive info never logged
+- [x] URL open handles invalid protocols safely
 
 ---
 
@@ -443,4 +495,41 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 | `androidTest/.../DaoInstrumentedTest.kt` | Instrumented tests: vault/item CRUD, search, soft delete, restore, favorites (8 tests) |
 | `androidTest/.../MigrationTest.kt` | Instrumented tests: schema creation, database version (2 tests) |
 
-**Files kept** from M0: `PassGoApplication.kt`, theme (`Color.kt`, `Type.kt`), logging (`PassGoLogger.kt`, `LogLevel.kt`), `PassGoApplication.kt`, `AndroidManifest.xml`, `gradle/libs.versions.toml`, `.gitignore`, launcher icon resources, existing placeholder `VaultScreen.kt` and `PremiumScreen.kt`.
+### Milestone 2 — New Files
+
+**Vault Feature**
+| File | Lines | Purpose |
+|---|---|---|
+| `feature/vault/VaultViewModel.kt` | 123 | Reactive multi-filter list state |
+| `feature/vault/VaultScreen.kt` | 332 | Search, sort, filter chips, LazyColumn, FAB, empty state |
+| `feature/vault/AddEditItemViewModel.kt` | 177 | Full form VM with validation + password generator |
+| `feature/vault/AddEditItemScreen.kt` | 301 | Add/edit form with category/folder dropdowns, strength indicator |
+| `feature/vault/ItemDetailViewModel.kt` | 86 | Detail VM with copy, show/hide, open URL, delete |
+| `feature/vault/ItemDetailScreen.kt` | 259 | Detail screen with copy/Snackbar, show/hide, open, delete dialog |
+
+**Core Components**
+| File | Lines | Purpose |
+|---|---|---|
+| `core/model/VaultItemCategory.kt` | 16 | 12 categories with display names |
+| `core/security/PasswordGenerator.kt` | 54 | Crypto-strong `SecureRandom` password generator |
+| `core/ui/components/PasswordStrengthIndicator.kt` | 94 | Reusable strength bar + suggestions |
+
+### Milestone 2 — Modified Files
+| File | Changes |
+|---|---|
+| `core/model/VaultItem.kt` | Replaced `ItemType` with `VaultItemCategory`, added `email` field |
+| `core/database/entity/VaultItemEntity.kt` | Added `email` column |
+| `core/database/dao/VaultItemDao.kt` | Extended to 16 query methods (search, filter, sort by name/newest/favorite) |
+| `core/database/DatabaseMigrations.kt` | Replaced MIGRATION_1_2 with email ADD COLUMN migration |
+| `core/database/PassGoDatabase.kt` | Version 2, added migration registration |
+| `data/mapper/Mappers.kt` | Updated for VaultItemCategory mapping + email |
+| `data/repository/VaultItemRepository.kt` | Added getById, search, sorted queries |
+| `data/repository/VaultItemRepositoryImpl.kt` | Implemented all new query methods |
+| `di/DatabaseModule.kt` | Restructured to abstract class with `@Binds` for repositories |
+| `core/navigation/PassGoNavHost.kt` | Added vault/add, vault/detail/{id}, vault/edit/{id} routes |
+| `feature/home/HomeScreen.kt` | Added `onAddItem` callback, wired FAB navigation |
+| `feature/vault/VaultScreen.kt` | Full rewrite from placeholder |
+| `README.md` | Updated features, screens, milestone status |
+| `PROJECT_MAP.md` | This file — updated throughout |
+
+**Files kept** from M0/M1: `PassGoApplication.kt`, theme (`Color.kt`, `Type.kt`), logging (`PassGoLogger.kt`, `LogLevel.kt`), `PassGoApplication.kt`, `AndroidManifest.xml`, `gradle/libs.versions.toml`,`.gitignore`, launcher icon resources, `PremiumScreen.kt`.
