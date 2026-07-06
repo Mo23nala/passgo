@@ -11,4 +11,5 @@ interface FolderRepository {
     suspend fun update(folder: Folder): AppResult<Unit>
     suspend fun softDelete(id: String): AppResult<Unit>
     suspend fun permanentDelete(id: String): AppResult<Unit>
+    suspend fun rename(id: String, newName: String): AppResult<Unit>
 }

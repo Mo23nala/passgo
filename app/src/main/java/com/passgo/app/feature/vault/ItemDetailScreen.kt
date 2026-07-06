@@ -3,30 +3,40 @@ package com.passgo.app.feature.vault
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -41,8 +51,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.passgo.app.core.model.Folder
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ItemDetailScreen(
     itemId: String,
@@ -53,7 +65,12 @@ fun ItemDetailScreen(
     val item by viewModel.item.collectAsState()
     val passwordVisible by viewModel.passwordVisible.collectAsState()
     val copyFeedback by viewModel.copyFeedback.collectAsState()
+    val tags by viewModel.tags.collectAsState()
+    val folders by viewModel.folders.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showArchiveDialog by remember { mutableStateOf(false) }
+    var showMoveToFolderDialog by remember { mutableStateOf(false) }
+    var showOverflowMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(itemId) {
         viewModel.loadItem(itemId)
@@ -85,128 +102,159 @@ fun ItemDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            IconButton(onClick = { onEdit(vaultItem.id) }) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit")
-            }
-            IconButton(onClick = { showDeleteDialog = true }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete")
-            }
-        }
-
-        Text(
-            vaultItem.name,
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Text(
-            vaultItem.category.displayName,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (vaultItem.username.isNotEmpty()) {
-            DetailField(
-                label = "Username",
-                value = vaultItem.username,
-                onCopy = { viewModel.copyToClipboard("Username", vaultItem.username) }
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        }
-
-        if (vaultItem.email.isNotEmpty()) {
-            DetailField(
-                label = "Email",
-                value = vaultItem.email,
-                onCopy = { viewModel.copyToClipboard("Email", vaultItem.email) }
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        }
-
-        DetailField(
-            label = "Password",
-            value = if (passwordVisible) vaultItem.password else "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
-            onCopy = { viewModel.copyToClipboard("Password", vaultItem.password) },
-            trailing = {
-                IconButton(onClick = viewModel::togglePasswordVisibility) {
-                    Icon(
-                        if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                        contentDescription = if (passwordVisible) "Hide" else "Show"
-                    )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { onEdit(vaultItem.id) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit")
                 }
-            }
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-        if (vaultItem.url.isNotEmpty()) {
-            DetailField(
-                label = "Website",
-                value = vaultItem.url,
-                onCopy = { viewModel.copyToClipboard("Website", vaultItem.url) },
-                trailing = {
-                    IconButton(onClick = { viewModel.openWebsite(vaultItem.url) }) {
-                        Icon(Icons.Default.Language, contentDescription = "Open")
+                Box {
+                    IconButton(onClick = { showOverflowMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More")
+                    }
+                    DropdownMenu(
+                        expanded = showOverflowMenu,
+                        onDismissRequest = { showOverflowMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Archive") },
+                            onClick = {
+                                showOverflowMenu = false
+                                showArchiveDialog = true
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Archive, contentDescription = null, modifier = Modifier.size(18.dp))
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Move to Folder") },
+                            onClick = {
+                                showOverflowMenu = false
+                                showMoveToFolderDialog = true
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp))
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                showOverflowMenu = false
+                                showDeleteDialog = true
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
+                            }
+                        )
                     }
                 }
-            )
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-        }
-
-        if (vaultItem.notes.isNotEmpty()) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Notes",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        vaultItem.notes,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
             }
-        }
 
-        if (vaultItem.favorite) {
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "\u2605 Favorite",
-                style = MaterialTheme.typography.bodySmall,
+                vaultItem.name,
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Text(
+                vaultItem.category.displayName,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-        }
-    }
 
-        if (showDeleteDialog) {
-            AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Delete Item") },
-                text = { Text("Move this item to trash?") },
-                confirmButton = {
-                    TextButton(onClick = {
-                        viewModel.deleteItem(onNavigateBack)
-                        showDeleteDialog = false
-                    }) {
-                        Text("Delete")
+            if (tags.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    tags.forEach { tag ->
+                        SuggestionChip(
+                            onClick = {},
+                            label = { Text(tag.name, style = MaterialTheme.typography.labelSmall) }
+                        )
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("Cancel")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (vaultItem.username.isNotEmpty()) {
+                DetailField(
+                    label = "Username",
+                    value = vaultItem.username,
+                    onCopy = { viewModel.copyToClipboard("Username", vaultItem.username) }
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+
+            if (vaultItem.email.isNotEmpty()) {
+                DetailField(
+                    label = "Email",
+                    value = vaultItem.email,
+                    onCopy = { viewModel.copyToClipboard("Email", vaultItem.email) }
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+
+            DetailField(
+                label = "Password",
+                value = if (passwordVisible) vaultItem.password else "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+                onCopy = { viewModel.copyToClipboard("Password", vaultItem.password) },
+                trailing = {
+                    IconButton(onClick = viewModel::togglePasswordVisibility) {
+                        Icon(
+                            if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (passwordVisible) "Hide" else "Show"
+                        )
                     }
                 }
             )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            if (vaultItem.url.isNotEmpty()) {
+                DetailField(
+                    label = "Website",
+                    value = vaultItem.url,
+                    onCopy = { viewModel.copyToClipboard("Website", vaultItem.url) },
+                    trailing = {
+                        IconButton(onClick = { viewModel.openWebsite(vaultItem.url) }) {
+                            Icon(Icons.Default.Language, contentDescription = "Open")
+                        }
+                    }
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+
+            if (vaultItem.notes.isNotEmpty()) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            "Notes",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            vaultItem.notes,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+
+            if (vaultItem.favorite) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "\u2605 Favorite",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         copyFeedback?.let { feedback ->
@@ -224,6 +272,90 @@ fun ItemDetailScreen(
             }
         }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Item") },
+            text = { Text("Move this item to trash?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteItem(onNavigateBack)
+                    showDeleteDialog = false
+                }) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showArchiveDialog) {
+        AlertDialog(
+            onDismissRequest = { showArchiveDialog = false },
+            title = { Text("Archive Item") },
+            text = { Text("Archive this item? It will be hidden from your main vault.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.archiveItem(onNavigateBack)
+                    showArchiveDialog = false
+                }) {
+                    Text("Archive")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showArchiveDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showMoveToFolderDialog) {
+        MoveToFolderDialog(
+            folders = folders,
+            onSelect = { folderId ->
+                viewModel.moveItem(folderId)
+                showMoveToFolderDialog = false
+            },
+            onDismiss = { showMoveToFolderDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun MoveToFolderDialog(
+    folders: List<Folder>,
+    onSelect: (String?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Move to Folder") },
+        text = {
+            Column {
+                TextButton(onClick = { onSelect(null) }, modifier = Modifier.fillMaxWidth()) {
+                    Text("No folder")
+                }
+                folders.forEach { folder ->
+                    TextButton(
+                        onClick = { onSelect(folder.id) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(folder.name)
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Cancel") }
+        }
+    )
 }
 
 @Composable

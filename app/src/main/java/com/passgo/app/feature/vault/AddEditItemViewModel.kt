@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.passgo.app.core.error.AppResult
 import com.passgo.app.core.logging.PassGoLogger
 import com.passgo.app.core.model.Folder
+import com.passgo.app.core.model.Tag
 import com.passgo.app.core.model.VaultItem
 import com.passgo.app.core.model.VaultItemCategory
 import com.passgo.app.core.security.PasswordGenerator
@@ -62,6 +63,9 @@ class AddEditItemViewModel @Inject constructor(
     private val _selectedFolderId = MutableStateFlow<String?>(null)
     val selectedFolderId: StateFlow<String?> = _selectedFolderId.asStateFlow()
 
+    private val _selectedTagIds = MutableStateFlow<Set<String>>(emptySet())
+    val selectedTagIds: StateFlow<Set<String>> = _selectedTagIds.asStateFlow()
+
     private val _passwordVisible = MutableStateFlow(false)
     val passwordVisible: StateFlow<Boolean> = _passwordVisible.asStateFlow()
 
@@ -75,6 +79,9 @@ class AddEditItemViewModel @Inject constructor(
     val saveComplete: StateFlow<Boolean> = _saveComplete.asStateFlow()
 
     val folders: StateFlow<List<Folder>> = folderRepository.getActiveFolders(vaultId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val tags: StateFlow<List<Tag>> = tagRepository.getActiveTags(vaultId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val passwordStrength: StateFlow<PasswordValidator.PasswordStrength>
@@ -97,6 +104,9 @@ class AddEditItemViewModel @Inject constructor(
                     _selectedFolderId.value = item.folderId
                 }
             }
+            tagRepository.getTagsForItem(itemId).collect { tagList ->
+                _selectedTagIds.value = tagList.map { it.id }.toSet()
+            }
         }
     }
 
@@ -113,6 +123,11 @@ class AddEditItemViewModel @Inject constructor(
     fun setFavorite(value: Boolean) { _favorite.value = value }
     fun setFolder(folderId: String?) { _selectedFolderId.value = folderId }
     fun togglePasswordVisibility() { _passwordVisible.value = !_passwordVisible.value }
+
+    fun toggleTag(tagId: String) {
+        val current = _selectedTagIds.value
+        _selectedTagIds.value = if (tagId in current) current - tagId else current + tagId
+    }
 
     fun generatePassword() {
         val generated = passwordGenerator.generate(
@@ -165,7 +180,9 @@ class AddEditItemViewModel @Inject constructor(
 
             when (result) {
                 is AppResult.Success -> {
-                    logger.info("AddEditItemViewModel", "Saved item: ${item.id}")
+                    val savedItemId = editItemId ?: item.id
+                    tagRepository.setItemTags(savedItemId, _selectedTagIds.value.toList())
+                    logger.info("AddEditItemViewModel", "Saved item: $savedItemId")
                     _saveComplete.value = true
                 }
                 is AppResult.Error -> {

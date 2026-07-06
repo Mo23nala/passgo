@@ -26,6 +26,9 @@ interface TagDao {
     """)
     fun getTagsForItem(itemId: String): Flow<List<TagEntity>>
 
+    @Query("SELECT * FROM tags WHERE vault_id = :vaultId AND deleted_at IS NULL AND name LIKE '%' || :query || '%' ORDER BY name ASC")
+    fun searchTags(vaultId: String, query: String): Flow<List<TagEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(tag: TagEntity)
 
@@ -40,4 +43,7 @@ interface TagDao {
 
     @Query("DELETE FROM tag_item WHERE tag_id = :tagId AND item_id = :itemId")
     suspend fun removeTagFromItem(tagId: String, itemId: String)
+
+    @Query("DELETE FROM tag_item WHERE item_id = :itemId")
+    suspend fun removeAllTagsFromItem(itemId: String)
 }

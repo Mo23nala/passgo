@@ -32,8 +32,17 @@ class VaultItemRepositoryImpl @Inject constructor(
     override fun getFavorites(vaultId: String): Flow<List<VaultItem>> =
         vaultItemDao.getFavorites(vaultId).map { list -> list.map { it.toDomain() } }
 
+    override fun getArchivedItems(vaultId: String): Flow<List<VaultItem>> =
+        vaultItemDao.getArchivedItems(vaultId).map { list -> list.map { it.toDomain() } }
+
     override fun getDeleted(vaultId: String): Flow<List<VaultItem>> =
         vaultItemDao.getDeleted(vaultId).map { list -> list.map { it.toDomain() } }
+
+    override fun getRecentItems(vaultId: String): Flow<List<VaultItem>> =
+        vaultItemDao.getRecentItems(vaultId).map { list -> list.map { it.toDomain() } }
+
+    override fun getItemsByTags(vaultId: String, tagIds: List<String>): Flow<List<VaultItem>> =
+        vaultItemDao.getItemsByTags(vaultId, tagIds, tagIds.size).map { list -> list.map { it.toDomain() } }
 
     override fun searchItems(vaultId: String, query: String): Flow<List<VaultItem>> =
         vaultItemDao.searchItems(vaultId, query).map { list -> list.map { it.toDomain() } }
@@ -93,6 +102,34 @@ class VaultItemRepositoryImpl @Inject constructor(
 
     override suspend fun permanentDelete(id: String): AppResult<Unit> = runCatching {
         vaultItemDao.permanentDelete(id)
+    }.fold(
+        onSuccess = { AppResult.Success(Unit) },
+        onFailure = { AppResult.Error(AppException.fromThrowable(it)) }
+    )
+
+    override suspend fun archive(id: String): AppResult<Unit> = runCatching {
+        vaultItemDao.archive(id)
+    }.fold(
+        onSuccess = { AppResult.Success(Unit) },
+        onFailure = { AppResult.Error(AppException.fromThrowable(it)) }
+    )
+
+    override suspend fun unarchive(id: String): AppResult<Unit> = runCatching {
+        vaultItemDao.unarchive(id)
+    }.fold(
+        onSuccess = { AppResult.Success(Unit) },
+        onFailure = { AppResult.Error(AppException.fromThrowable(it)) }
+    )
+
+    override suspend fun moveItem(itemId: String, folderId: String?): AppResult<Unit> = runCatching {
+        vaultItemDao.moveItem(itemId, folderId)
+    }.fold(
+        onSuccess = { AppResult.Success(Unit) },
+        onFailure = { AppResult.Error(AppException.fromThrowable(it)) }
+    )
+
+    override suspend fun permanentDeleteOldTrash(threshold: Long): AppResult<Unit> = runCatching {
+        vaultItemDao.permanentDeleteOldTrash(threshold)
     }.fold(
         onSuccess = { AppResult.Success(Unit) },
         onFailure = { AppResult.Error(AppException.fromThrowable(it)) }

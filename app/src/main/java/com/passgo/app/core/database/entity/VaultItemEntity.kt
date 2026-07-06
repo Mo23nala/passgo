@@ -26,7 +26,8 @@ import androidx.room.PrimaryKey
         Index(value = ["vault_id"]),
         Index(value = ["folder_id"]),
         Index(value = ["type"]),
-        Index(value = ["deleted_at"])
+        Index(value = ["deleted_at"]),
+        Index(value = ["archived_at"])
     ]
 )
 data class VaultItemEntity(
@@ -44,6 +45,8 @@ data class VaultItemEntity(
     val url: String = "",
     val notes: String = "",
     val favorite: Boolean = false,
+    @ColumnInfo(name = "archived_at")
+    val archivedAt: Long? = null,
     @ColumnInfo(name = "created_at")
     val createdAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "updated_at")

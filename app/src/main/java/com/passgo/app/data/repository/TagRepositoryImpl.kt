@@ -26,6 +26,9 @@ class TagRepositoryImpl @Inject constructor(
     override fun getTagsForItem(itemId: String): Flow<List<Tag>> =
         tagDao.getTagsForItem(itemId).map { list -> list.map { it.toDomain() } }
 
+    override fun searchTags(vaultId: String, query: String): Flow<List<Tag>> =
+        tagDao.searchTags(vaultId, query).map { list -> list.map { it.toDomain() } }
+
     override suspend fun insert(tag: Tag): AppResult<Unit> = runCatching {
         tagDao.insert(tag.toEntity())
     }.fold(
@@ -56,6 +59,16 @@ class TagRepositoryImpl @Inject constructor(
 
     override suspend fun removeTagFromItem(tagId: String, itemId: String): AppResult<Unit> = runCatching {
         tagDao.removeTagFromItem(tagId, itemId)
+    }.fold(
+        onSuccess = { AppResult.Success(Unit) },
+        onFailure = { AppResult.Error(AppException.fromThrowable(it)) }
+    )
+
+    override suspend fun setItemTags(itemId: String, tagIds: List<String>): AppResult<Unit> = runCatching {
+        tagDao.removeAllTagsFromItem(itemId)
+        tagIds.forEach { tagId ->
+            tagDao.addTagToItem(TagItemCrossRef(tagId, itemId))
+        }
     }.fold(
         onSuccess = { AppResult.Success(Unit) },
         onFailure = { AppResult.Error(AppException.fromThrowable(it)) }

@@ -11,7 +11,10 @@ interface VaultItemRepository {
     fun getByType(vaultId: String, category: VaultItemCategory): Flow<List<VaultItem>>
     fun getByFolder(folderId: String): Flow<List<VaultItem>>
     fun getFavorites(vaultId: String): Flow<List<VaultItem>>
+    fun getArchivedItems(vaultId: String): Flow<List<VaultItem>>
     fun getDeleted(vaultId: String): Flow<List<VaultItem>>
+    fun getRecentItems(vaultId: String): Flow<List<VaultItem>>
+    fun getItemsByTags(vaultId: String, tagIds: List<String>): Flow<List<VaultItem>>
     fun searchItems(vaultId: String, query: String): Flow<List<VaultItem>>
     fun searchByType(vaultId: String, type: VaultItemCategory, query: String): Flow<List<VaultItem>>
     fun searchFavorites(vaultId: String, query: String): Flow<List<VaultItem>>
@@ -25,4 +28,8 @@ interface VaultItemRepository {
     suspend fun softDelete(id: String): AppResult<Unit>
     suspend fun restore(id: String): AppResult<Unit>
     suspend fun permanentDelete(id: String): AppResult<Unit>
+    suspend fun archive(id: String): AppResult<Unit>
+    suspend fun unarchive(id: String): AppResult<Unit>
+    suspend fun moveItem(itemId: String, folderId: String?): AppResult<Unit>
+    suspend fun permanentDeleteOldTrash(threshold: Long): AppResult<Unit>
 }

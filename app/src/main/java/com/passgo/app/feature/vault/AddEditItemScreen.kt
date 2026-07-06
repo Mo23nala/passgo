@@ -1,6 +1,9 @@
 package com.passgo.app.feature.vault
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +23,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -48,7 +52,7 @@ import com.passgo.app.core.model.VaultItemCategory
 import com.passgo.app.core.ui.components.PasswordStrengthIndicator
 import com.passgo.app.core.ui.components.PasswordStrengthSuggestions
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AddEditItemScreen(
     itemId: String?,
@@ -258,6 +262,25 @@ fun AddEditItemScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        if (viewModel.tags.value.isNotEmpty()) {
+            Text("Tags", style = MaterialTheme.typography.titleSmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                viewModel.tags.value.forEach { tag ->
+                    FilterChip(
+                        selected = tag.id in viewModel.selectedTagIds.value,
+                        onClick = { viewModel.toggleTag(tag.id) },
+                        label = { Text(tag.name) }
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(12.dp))
         }
 

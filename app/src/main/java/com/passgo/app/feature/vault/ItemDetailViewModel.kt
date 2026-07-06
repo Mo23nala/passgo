@@ -9,22 +9,32 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.passgo.app.core.error.AppResult
 import com.passgo.app.core.logging.PassGoLogger
+import com.passgo.app.core.model.Folder
+import com.passgo.app.core.model.Tag
 import com.passgo.app.core.model.VaultItem
+import com.passgo.app.data.repository.FolderRepository
+import com.passgo.app.data.repository.TagRepository
 import com.passgo.app.data.repository.VaultItemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ItemDetailViewModel @Inject constructor(
     private val vaultItemRepository: VaultItemRepository,
+    private val tagRepository: TagRepository,
+    private val folderRepository: FolderRepository,
     private val logger: PassGoLogger,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val vaultId = "default"
 
     private val _item = MutableStateFlow<VaultItem?>(null)
     val item: StateFlow<VaultItem?> = _item.asStateFlow()
@@ -35,10 +45,21 @@ class ItemDetailViewModel @Inject constructor(
     private val _copyFeedback = MutableStateFlow<String?>(null)
     val copyFeedback: StateFlow<String?> = _copyFeedback.asStateFlow()
 
+    private val _tags = MutableStateFlow<List<Tag>>(emptyList())
+    val tags: StateFlow<List<Tag>> = _tags.asStateFlow()
+
+    val folders: StateFlow<List<Folder>> = folderRepository.getActiveFolders(vaultId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     fun loadItem(itemId: String) {
         viewModelScope.launch {
             vaultItemRepository.getItemById(itemId).collect { loaded ->
                 _item.value = loaded
+            }
+        }
+        viewModelScope.launch {
+            tagRepository.getTagsForItem(itemId).collect { tagList ->
+                _tags.value = tagList
             }
         }
     }
@@ -81,6 +102,29 @@ class ItemDetailViewModel @Inject constructor(
                     onDeleted()
                 }
                 is AppResult.Error -> logger.error("ItemDetailViewModel", "Delete failed")
+            }
+        }
+    }
+
+    fun archiveItem(onArchived: () -> Unit) {
+        val currentId = _item.value?.id ?: return
+        viewModelScope.launch {
+            when (vaultItemRepository.archive(currentId)) {
+                is AppResult.Success -> {
+                    logger.info("ItemDetailViewModel", "Archived item: $currentId")
+                    onArchived()
+                }
+                is AppResult.Error -> logger.error("ItemDetailViewModel", "Archive failed")
+            }
+        }
+    }
+
+    fun moveItem(folderId: String?) {
+        val currentId = _item.value?.id ?: return
+        viewModelScope.launch {
+            when (vaultItemRepository.moveItem(currentId, folderId)) {
+                is AppResult.Success -> logger.info("ItemDetailViewModel", "Moved item $currentId")
+                is AppResult.Error -> logger.error("ItemDetailViewModel", "Move failed")
             }
         }
     }

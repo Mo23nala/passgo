@@ -2,7 +2,7 @@
 
 A professional Android password manager with encrypted local storage.
 
-> **Status:** Milestone 3C — Autofill Polish, Compatibility & Security (Complete)
+> **Status:** Milestone 4A — Vault Organization (Complete)
 > **Target:** Android 16 (API 36), APK distribution
 
 ## Architecture
@@ -46,6 +46,12 @@ Feature-first, single-module Android app built with:
 | Inline suggestions (Android 12+) | ✅ |
 | Biometric authentication for autofill | ✅ |
 | Accessibility (content descriptions, screen reader support) | ✅ |
+| Smart collections (Recent, Favorites, Archived, Trash, Categories) | ✅ |
+| Smart folders (create, rename, delete) | ✅ |
+| Tags (multi-tag, create, delete, filter by multiple tags) | ✅ |
+| Archive / restore items | ✅ |
+| Trash (soft delete, restore, permanent delete) | ✅ |
+| Folder management | ✅ |
 
 ## Screens
 
@@ -84,5 +90,7 @@ Feature-first, single-module Android app built with:
 | M3A | Autofill Foundation | ✅ Complete |
 | M3B | Autofill Engine | ✅ Complete |
 | M3C | Autofill Polish, Compatibility & Security | ✅ Complete |
-| M4 | Vault Features (TOTP, tags, bulk, trash) | ⏳ Pending |
+| M4A | Vault Organization (folders, tags, favorites, archive, trash, collections) | ✅ Complete |
+| M4B | Vault Item Types (secure notes, credit cards, identities) | ⏳ Pending |
+| M4C | Advanced Search & Attachments (full-text, files, preview) | ⏳ Pending |
 | M5 | Security + Polish (clipboard, audit, accessibility) | ⏳ Pending |

@@ -49,4 +49,11 @@ class FolderRepositoryImpl @Inject constructor(
         onSuccess = { AppResult.Success(Unit) },
         onFailure = { AppResult.Error(AppException.fromThrowable(it)) }
     )
+
+    override suspend fun rename(id: String, newName: String): AppResult<Unit> = runCatching {
+        folderDao.rename(id, newName)
+    }.fold(
+        onSuccess = { AppResult.Success(Unit) },
+        onFailure = { AppResult.Error(AppException.fromThrowable(it)) }
+    )
 }

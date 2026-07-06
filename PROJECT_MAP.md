@@ -1,7 +1,7 @@
 # PROJECT_MAP — PassGo
 
 > **Last Updated:** 2026-07-06  
-> **Status:** Milestone 3C — Autofill Polish, Compatibility & Security (Complete)  
+> **Status:** Milestone 4A — Vault Organization (Complete)  
 > **Target Platform:** Android 16 (API 36)
 
 ---
@@ -158,7 +158,7 @@ App → MasterKeyManager.getOrCreateMasterKey() → KeyStoreManager (KeyStore AE
 | Table | Columns | Foreign Keys |
 |---|---|---|
 | `vaults` | id, name, description, created_at, updated_at, deleted_at, sync_version, sync_status | — |
-| `vault_items` | id, vault_id, folder_id, type, name, username, password, url, notes, favorite, created_at, updated_at, deleted_at, sync_version, sync_status | vault_id→vaults, folder_id→folders |
+| `vault_items` | id, vault_id, folder_id, type, name, username, password, url, notes, favorite, archived_at, created_at, updated_at, deleted_at, sync_version, sync_status | vault_id→vaults, folder_id→folders |
 | `folders` | id, vault_id, name, icon, parent_id, sort_order, created_at, updated_at, deleted_at, sync_version, sync_status | vault_id→vaults, parent_id→folders |
 | `tags` | id, vault_id, name, color, created_at, updated_at, deleted_at, sync_version, sync_status | vault_id→vaults |
 | `tag_item` | tag_id, item_id | tag_id→tags, item_id→vault_items |
@@ -264,7 +264,9 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 | M3A | **Autofill Foundation** (✅ Done) | AutofillService registered, session lifecycle, field detection, domain handling, response builder, all compile |
 | M3B | **Autofill Engine** (✅ Done) | Vault integration, credential matching, dataset filling, save request handling, auth-aware responses |
 | M3C | **Autofill Polish, Compatibility & Security** (✅ Done) | Biometric auth, inline suggestions, UX polish, accessibility, compatibility, security hardening, error recovery |
-| M4 | **Vault Features** (⏳ Pending) | TOTP, tags, bulk operations, trash management |
+| M4A | **Vault Organization** (✅ Done) | Smart folders, tags, favorites, archive, trash, smart collections |
+| M4B | **Vault Item Types** (⏳ Pending) | Secure notes, credit cards, identities, custom fields |
+| M4C | **Advanced Search & Attachments** (⏳ Pending) | Full-text search, file attachments, preview |
 | M5 | **Security + Polish** (⏳ Pending) | Auto-clear clipboard, security audit, accessibility, crash reporting |
 
 ---
@@ -613,6 +615,97 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 - [x] `assembleDebug` — BUILD SUCCESSFUL
 - [x] `testDebugUnitTest` — passes
 
+### Milestone 4A — Vault Organization (✅ Complete)
+
+#### 1. Smart Folders
+- [x] Default folders (created on demand via "Create Folder" dialog)
+- [x] Custom folders with rename and delete
+- [x] Move items between folders (VaultScreen + ItemDetailScreen)
+- [x] Folder selector dialog for moving items
+- [x] Rename dialog with current name pre-filled
+- [x] Delete with confirmation, items preserved (folder_id set to null)
+
+#### 2. Tags
+- [x] Multiple tags per item (many-to-many via tag_item cross-ref)
+- [x] Create tag via "+ Tag" chip in filter row
+- [x] Delete tag with confirmation (removed from all items)
+- [x] Filter by one or more tags (AND logic via HAVING COUNT)
+- [x] Tag selection chips in AddEditItemScreen
+- [x] Tag display chips in ItemDetailScreen
+- [x] Tag filter chips in VaultScreen
+- [x] Tag search via TagDao.searchTags()
+
+#### 3. Favorites
+- [x] Pin/unpin favorite items (toggle star in VaultScreen)
+- [x] Favorite filter collection (Favorites smart collection)
+- [x] Favorite sorting (SortOption.FAVORITE)
+
+#### 4. Archive
+- [x] `archived_at` column on vault_items table
+- [x] Archive items (sets archived_at timestamp)
+- [x] Unarchive/restore archived items (clears archived_at)
+- [x] Archived items hidden from All Items, Recent, Favorites, Categories, Folders
+- [x] Archived smart collection to view archived items
+- [x] Archive action in overflow menu (VaultScreen long-press, ItemDetailScreen)
+
+#### 5. Trash
+- [x] Soft delete (sets deleted_at timestamp) — already existed
+- [x] Restore from trash (clears deleted_at)
+- [x] Permanent delete
+- [x] Trash smart collection view
+- [x] Automatic cleanup infrastructure (permanentDeleteOldTrash query, old trash count)
+- [x] Empty state messages per collection
+
+#### 6. Smart Collections
+- [x] All Items — default view, all active non-archived, non-deleted items
+- [x] Recent — last 20 updated items
+- [x] Favorites — all favorited active items
+- [x] Archived — all archived non-deleted items
+- [x] Trash — all soft-deleted items
+- [x] Banking, Google, Email, Social Media — category-filtered views
+- [x] User-created folders appear in collection selector
+- [x] `VaultCollection` sealed class for type-safe collection routing
+
+#### 7. UI Improvements
+- [x] Collection selector dropdown (smart collections + categories + folders)
+- [x] Tag filter chips with multi-select
+- [x] Context menu on long-press (archive, move, delete)
+- [x] Collection-aware empty states with contextual hints
+- [x] Folder management (create/rename/delete dialogs)
+- [x] Tag management (create/delete dialogs)
+- [x] Move-to-folder dialog
+- [x] Material 3 components throughout
+
+#### Data Layer
+- [x] `VaultItemDao`: archive/unarchive, getArchivedItems, getRecentItems, getItemsByTags, moveItem, permanentDeleteOldTrash
+- [x] `FolderDao`: rename, getItemCount queries
+- [x] `TagDao`: searchTags, removeAllTagsFromItem
+- [x] `DatabaseMigrations`: MIGRATION_2_3 (archived_at column + index)
+- [x] `PassGoDatabase`: version bumped to 3, migration registered
+- [x] `VaultItemRepositoryImpl`: archive, unarchive, moveItem, permanentDeleteOldTrash, getItemsByTags
+- [x] `FolderRepositoryImpl`: rename
+- [x] `TagRepositoryImpl`: setItemTags (replace all tags on item)
+- [x] `VaultItem` model: added `archivedAt` field
+- [x] `Mappers.kt`: archivedAt mapping for entity↔domain
+
+#### Security
+- [x] Archived and trashed items remain encrypted (SQLCipher transparent encryption)
+- [x] No sensitive information in logs
+- [x] No passwords, usernames, or emails logged
+
+#### Performance
+- [x] Reactive queries (Flow-based, auto-update)
+- [x] Efficient Room queries (indexed archived_at, tagged join with HAVING COUNT)
+- [x] Tag filter applied in-memory from two reactive flows (avoids complex dynamic SQL)
+- [x] Collection-based routing uses specific DAO queries (not post-filtering)
+
+#### Build Verification
+- [x] `compileDebugKotlin` — zero errors, zero warnings
+- [x] `assembleDebug` — BUILD SUCCESSFUL
+- [x] `testDebugUnitTest` — passes
+- [x] No TODO/FIXME/HACK
+- [x] No deprecated APIs
+
 ---
 
 ## FILES_CREATED
@@ -829,3 +922,28 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 | `res/values/strings.xml` | — | Added autofill string resources (biometric prompt, empty state, accessibility) |
 | `PROJECT_MAP.md` | — | Added M3C sections, file entries, milestone status |
 | `README.md` | — | Updated features list and milestone plan |
+
+### Milestone 4A — Modified Files
+
+| File | Lines | Changes |
+|------|-------|---------|
+| `core/database/entity/VaultItemEntity.kt` | 57 → 58 | Added `archived_at` column |
+| `core/database/dao/VaultItemDao.kt` | 93 → 126 | Added archive, unarchive, getArchivedItems, getRecentItems, getItemsByTags, moveItem, permanentDeleteOldTrash queries; updated all existing queries to exclude archived items |
+| `core/database/dao/FolderDao.kt` | 34 → 39 | Added rename, getItemCount queries |
+| `core/database/dao/TagDao.kt` | 43 → 50 | Added searchTags, removeAllTagsFromItem |
+| `core/database/DatabaseMigrations.kt` | 13 → 20 | Added MIGRATION_2_3 (archived_at + index) |
+| `core/database/PassGoDatabase.kt` | — | Version bumped 2→3 |
+| `core/model/VaultItem.kt` | 20 → 21 | Added `archivedAt` field |
+| `data/mapper/Mappers.kt` | 154 → 158 | Added archivedAt ↔ archivedAt mapping |
+| `data/repository/VaultItemRepository.kt` | 28 → 37 | Added archive, unarchive, moveItem, permanentDeleteOldTrash, getArchivedItems, getRecentItems, getItemsByTags |
+| `data/repository/VaultItemRepositoryImpl.kt` | 100 → 150 | Implemented all new repository methods |
+| `data/repository/FolderRepository.kt` | 14 → 15 | Added rename |
+| `data/repository/FolderRepositoryImpl.kt` | 52 → 55 | Implemented rename |
+| `data/repository/TagRepository.kt` | 16 → 18 | Added searchTags, setItemTags |
+| `data/repository/TagRepositoryImpl.kt` | 63 → 80 | Implemented searchTags, setItemTags |
+| `feature/vault/VaultViewModel.kt` | 123 → 240 | Complete rewrite: VaultCollection sealed class, collection routing, tag filtering, folder CRUD, tag CRUD, archive/trash actions |
+| `feature/vault/VaultScreen.kt` | 332 → 550+ | Complete rewrite: collection dropdown, tag chips, folder management dialogs, context menu, archive/trash, collection-aware empty states |
+| `feature/vault/AddEditItemViewModel.kt` | 179 → 195 | Added tag selection state, toggleTag, setItemTags on save |
+| `feature/vault/AddEditItemScreen.kt` | 301 → 315 | Added tag chip selection UI |
+| `feature/vault/ItemDetailViewModel.kt` | 87 → 110 | Added archiveItem, moveItem, tags loading, folders |
+| `feature/vault/ItemDetailScreen.kt` | 259 → 360+ | Added tag display chips, overflow menu (archive, move, delete) |

@@ -9,5 +9,10 @@ object DatabaseMigrations {
         db.execSQL("ALTER TABLE vault_items ADD COLUMN email TEXT NOT NULL DEFAULT ''")
     }
 
-    val ALL_MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2)
+    val MIGRATION_2_3 = Migration(2, 3) { db ->
+        db.execSQL("ALTER TABLE vault_items ADD COLUMN archived_at INTEGER")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_vault_items_archived_at ON vault_items(archived_at)")
+    }
+
+    val ALL_MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 }
