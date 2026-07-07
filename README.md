@@ -2,9 +2,8 @@
 
 A professional Android password manager with encrypted local storage.
 
-> **Status:** Milestone M4D — Advanced Search & Attachments ✅ Complete
-> **Target:** Android 16 (API 36), APK distribution
-
+>*Status:* Milestone 4D — Advanced Search & Attachments ✅ Complete
+>*Target:* Android 16 (API 36), APK distribution
 ## Architecture
 
 Feature-first, single-module Android app built with:
