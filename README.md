@@ -2,7 +2,7 @@
 
 A professional Android password manager with encrypted local storage.
 
-> **Status:** Milestone 4D.3 — Developer & Infrastructure Vault Templates (Complete)
+> **Status:** Milestone 4D — Advanced Search & Attachments (Complete)
 > **Target:** Android 16 (API 36), APK distribution
 
 ## Architecture
@@ -53,7 +53,7 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | Logging infrastructure | ✅ |
 | Error handling (AppResult) | ✅ |
 | Vault item list with search, sort, filter | ✅ |
-| Add/edit vault items with category & folder | ✅ |
+| Add/dit vault items with category & folder | ✅ |
 | Password generation (crypto-strong) | ✅ |
 | Password strength indicator | ✅ |
 | Item detail with copy, show/hide, open URL | ✅ |
@@ -63,7 +63,7 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | Save request handling (new + update existing) | ✅ |
 | Multiple account autofill | ✅ |
 | Locked vault protection | ✅ |
-| Inline suggestions (Android 12+) | ✅ |
+| Inline suggestions (Andrid 12+) | ✅ |
 | Biometric authentication for autofill | ✅ |
 | Accessibility (content descriptions, screen reader support) | ✅ |
 | Smart collections (Recent, Favorites, Archived, Trash, Categories) | ✅ |
@@ -72,7 +72,7 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | Archive / restore items | ✅ |
 | Trash (soft delete, restore, permanent delete) | ✅ |
 | Folder management | ✅ |
-| Custom field architecture (FieldId, FieldDefinition, custom_fields table) | ✅ |
+| Custom field architecture (FieldId, FieldDefinition, custom_fields table) | ✅ 
 | Unified search (VaultItem fields + custom field values) | ✅ |
 | Dynamic Vault Type Engine | ✅ |
 | Metadata-driven dynamic forms | ✅ |
@@ -83,6 +83,16 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | Reusable FieldDefinition validation engine | ✅ |
 | Dynamic category rendering | ✅ |
 | Generic custom field architecture | ✅ |
+| Full-text search engine (Room FTS4) | ✅ |
+| Search history and suggestions  ✅ |
+| Advanced search with relevance matching | ✅ |
+| Secure encrypted file attachments (AES-256-GCM) | ✅ |
+| Per-file encryption and secure internal storage | ✅ |
+| Attachment size validation and cleanup | ✅ |
+| Attachment preview system (images, text, external viewers) | ✅ |
+| FileProvider protected attachment sharing | ✅ |
+| Search highlighting in results | ✅ |
+
 
 ## Screens
 
@@ -132,16 +142,16 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | M4D.1 | Financial Vault Templates (Credit Card, Debit Card, Bank Account, PayPal, Wise, Stripe) | ✅ Complete |
 | M4D.2 | Identity & Personal Vault Templates (Passport, National ID, Driver License, Residence Permit, Health Insurance, Social Security, Tax ID, Student ID) | ✅ Complete |
 | M4D.3 | Developer & Infrastructure Vault Templates (GitHub, GitLab, Docker Hub, AWS, Azure, GCP, SSH Key, Database) | ✅ Complete |
-| M4D | Advanced Search & Attachments (full-text, files, preview) | ⏳ Pending |
+| M4D | Advanced Search & Attachments (full-text, encrypted files, preview) | ✅ Complete |
 | M5 | Security + Polish (clipboard, audit, accessibility) | ⏳ Pending |
 
 ## Roadmap
 
 | Feature | Status |
 |---|---|
-| Advanced Search & Attachments | ⏳ Pending |
-| Full-text search improvements | ⏳ Pending |
-| Encrypted file attachments | ⏳ Pending |
+| Advanced Search & Attachments | ✅ Complete |
+| Full-text search improvements | ✅ Complete |
+| Encrypted file attachments | ✅ Complete |
 | Clipboard security (auto-clear) | ⏳ Pending |
 | Security audit & hardening | ⏳ Pending |
 | Backup / restore | ⏳ Pending |
