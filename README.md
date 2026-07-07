@@ -63,7 +63,7 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | Save request handling (new + update existing) | ✅ |
 | Multiple account autofill | ✅ |
 | Locked vault protection | ✅ |
-| Inline suggestions (Andrid 12+) | ✅ |
+| Inline suggestions (Android 12+) | ✅ |
 | Biometric authentication for autofill | ✅ |
 | Accessibility (content descriptions, screen reader support) | ✅ |
 | Smart collections (Recent, Favorites, Archived, Trash, Categories) | ✅ |
