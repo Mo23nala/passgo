@@ -19,10 +19,30 @@ Feature-first, single-module Android app built with:
 - **DataStore Preferences** for app settings persistence
 - **Coroutines + Flow** for async operations
 
+## Architecture Decisions
+
+### Single Unified VaultItem Model
+All vault entries use one unified `VaultItem` model with a `VaultItemCategory` discriminator. There is no subclass per category — the category determines which fields are shown via metadata, not via a separate type.
+
+### Dynamic Vault Type Engine
+The metadata-driven engine generates every Add/Edit/Detail screen from `FieldDefinition` metadata at runtime. Category registration, field validation, formatting, and display are all driven by the `VaultItemCategory` enum entries.
+
+### FieldDefinition Metadata-Driven Architecture
+Each field identifier (`FieldId`) has a corresponding `FieldDefinition` sealed class implementation defining its label, input type, validation rules, formatting, parsing, and autofill hints. All category-level metadata (fields list, required fields, recommended fields, field groups) is declared declaratively in `VaultItemCategory`.
+
+### Custom Fields Stored as Structured Database Rows
+Fields that map to standard `VaultItem` columns (name, username, password, url, notes) are stored in those columns. All other fields are stored as rows in a dedicated `custom_fields` table with `(item_id, field_id, value, sort_order)`, joined via a LEFT JOIN for unified search.
+
+### No Separate Database Table Per Category
+Every category, from Google Account to SSH Key to Database, stores its data in the same `vault_items` and `custom_fields` tables. Adding a new category requires zero schema changes — only new `FieldId` enum entries, `FieldDefinition` objects, and a `VaultItemCategory` entry.
+
+### No Category-Specific Screens
+There are no per-category composables, ViewModels, or navigation routes. The `DynamicFormScreen` and `DynamicItemDetailScreen` render every category from metadata alone. Adding a new template does not require creating or modifying any UI code.
+
 ## Features
 
 | Feature | Status |
-|---|---|---|
+|---|---|
 | Encrypted local database (SQLCipher) | ✅ |
 | Master password creation with strength validation | ✅ |
 | Vault unlock with password verification | ✅ |
@@ -80,15 +100,11 @@ Feature-first, single-module Android app built with:
 
 ## Build
 
-```bash
-# Debug APK
-./gradlew :app:assembleDebug
+### Windows PowerShell
 
-# Unit tests
-./gradlew testDebugUnitTest
-
-# Instrumentation tests
-./gradlew connectedDebugAndroidTest
+```powershell
+.\gradlew :app:assembleDebug
+.\gradlew testDebugUnitTest
 ```
 
 ## Milestones
