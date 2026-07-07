@@ -80,6 +80,11 @@ fun VaultScreen(
     val selectedTagIds by viewModel.selectedTagIds.collectAsState()
     val folders by viewModel.folders.collectAsState()
     val tags by viewModel.tags.collectAsState()
+    val showCreateFolderDialog by viewModel.showCreateFolderDialog.collectAsState()
+    val showRenameFolderDialog by viewModel.showRenameFolderDialog.collectAsState()
+    val showDeleteFolderDialog by viewModel.showDeleteFolderDialog.collectAsState()
+    val showCreateTagDialog by viewModel.showCreateTagDialog.collectAsState()
+    val showDeleteTagDialog by viewModel.showDeleteTagDialog.collectAsState()
 
     var showSortMenu by remember { mutableStateOf(false) }
     var showCollectionMenu by remember { mutableStateOf(false) }
@@ -440,14 +445,14 @@ fun VaultScreen(
         )
     }
 
-    if (viewModel.showCreateFolderDialog.value) {
+    if (showCreateFolderDialog) {
         CreateFolderDialog(
             onConfirm = viewModel::createFolder,
             onDismiss = viewModel::hideCreateFolderDialog
         )
     }
 
-    viewModel.showRenameFolderDialog.value?.let { folder ->
+    showRenameFolderDialog?.let { folder ->
         RenameFolderDialog(
             currentName = folder.name,
             onConfirm = { newName -> viewModel.renameFolder(folder.id, newName) },
@@ -455,7 +460,7 @@ fun VaultScreen(
         )
     }
 
-    viewModel.showDeleteFolderDialog.value?.let { folder ->
+    showDeleteFolderDialog?.let { folder ->
         AlertDialog(
             onDismissRequest = viewModel::hideDeleteFolderDialog,
             title = { Text("Delete Folder") },
@@ -473,14 +478,14 @@ fun VaultScreen(
         )
     }
 
-    if (viewModel.showCreateTagDialog.value) {
+    if (showCreateTagDialog) {
         CreateTagDialog(
             onConfirm = viewModel::createTag,
             onDismiss = viewModel::hideCreateTagDialog
         )
     }
 
-    viewModel.showDeleteTagDialog.value?.let { tag ->
+    showDeleteTagDialog?.let { tag ->
         AlertDialog(
             onDismissRequest = viewModel::hideDeleteTagDialog,
             title = { Text("Delete Tag") },

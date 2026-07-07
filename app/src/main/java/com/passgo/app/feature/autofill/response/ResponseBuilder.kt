@@ -42,7 +42,7 @@ class ResponseBuilder @Inject constructor(
     fun buildAuthResponse(pendingIntent: PendingIntent): FillResponse {
         val responseBuilder = FillResponse.Builder()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val presentations = Presentations.Builder().build()
             responseBuilder.setAuthentication(
                 emptyArray<AutofillId>(),
