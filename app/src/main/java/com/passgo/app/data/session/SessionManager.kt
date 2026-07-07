@@ -2,6 +2,7 @@ package com.passgo.app.data.session
 
 import com.passgo.app.core.logging.PassGoLogger
 import com.passgo.app.core.security.MasterPasswordStore
+import com.passgo.app.data.settings.FailedAttemptStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +12,8 @@ import javax.inject.Singleton
 @Singleton
 class SessionManager @Inject constructor(
     private val logger: PassGoLogger,
-    private val passwordStore: MasterPasswordStore
+    private val passwordStore: MasterPasswordStore,
+    private val failedAttemptStore: FailedAttemptStore
 ) {
 
     private val _sessionState = MutableStateFlow(
@@ -26,6 +28,22 @@ class SessionManager @Inject constructor(
     private var autofillAuthAttempted: Boolean = false
 
     fun isUnlocked(): Boolean = _sessionState.value == SessionState.UNLOCKED
+
+    fun notifyFailedUnlockAttempt() {
+        val attempts = failedAttemptStore.getFailedAttempts() + 1
+        val lockedUntil = if (attempts >= MAX_FAILED_ATTEMPTS) {
+            System.currentTimeMillis() + LOCKOUT_DURATION_MS
+        } else 0L
+        failedAttemptStore.recordFailedAttempt(lockedUntil)
+    }
+
+    fun notifySuccessfulUnlock() {
+        failedAttemptStore.resetAttempts()
+    }
+
+    fun isLockedOut(): Boolean = failedAttemptStore.isLockedOut()
+
+    fun remainingLockoutTime(): Long = failedAttemptStore.getRemainingLockoutMs()
 
     fun unlock() {
         unlockedSince = System.currentTimeMillis()
@@ -82,5 +100,7 @@ class SessionManager @Inject constructor(
 
     companion object {
         private const val DEFAULT_AUTO_LOCK_MS = 300_000L
+        const val MAX_FAILED_ATTEMPTS = 5
+        const val LOCKOUT_DURATION_MS = 30_000L
     }
 }
