@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -45,6 +46,7 @@ import com.passgo.app.core.model.Attachment
 @Composable
 fun AttachmentSection(
     itemId: String,
+    onPreview: (String) -> Unit = {},
     viewModel: AttachmentViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -119,6 +121,7 @@ fun AttachmentSection(
             attachments.forEach { attachment ->
                 AttachmentRow(
                     attachment = attachment,
+                    onPreview = { onPreview(attachment.id) },
                     onDelete = {
                         attachmentToDelete = attachment.id
                         showDeleteDialog = true
@@ -173,6 +176,7 @@ fun AttachmentSection(
 @Composable
 private fun AttachmentRow(
     attachment: Attachment,
+    onPreview: () -> Unit = {},
     onDelete: () -> Unit
 ) {
     Row(
@@ -197,6 +201,14 @@ private fun AttachmentRow(
                 text = formatFileSize(attachment.sizeBytes),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        IconButton(onClick = onPreview) {
+            Icon(
+                Icons.Default.Visibility,
+                contentDescription = "Preview",
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary
             )
         }
         IconButton(onClick = onDelete) {

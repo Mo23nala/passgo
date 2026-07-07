@@ -50,6 +50,7 @@ fun DynamicItemDetailScreen(
     itemId: String,
     onNavigateBack: () -> Unit,
     onEdit: (String) -> Unit,
+    onAttachmentPreview: (String) -> Unit = {},
     viewModel: DynamicItemDetailViewModel = hiltViewModel()
 ) {
     val item by viewModel.item.collectAsState()
@@ -186,7 +187,10 @@ fun DynamicItemDetailScreen(
                 }
             }
 
-            AttachmentSection(itemId = vaultItem.id)
+            AttachmentSection(
+                itemId = vaultItem.id,
+                onPreview = onAttachmentPreview
+            )
         }
     }
 

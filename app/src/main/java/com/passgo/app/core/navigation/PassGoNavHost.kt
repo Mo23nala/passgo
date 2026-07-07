@@ -36,6 +36,7 @@ import com.passgo.app.feature.search.SearchScreen
 import com.passgo.app.feature.settings.SettingsScreen
 import com.passgo.app.feature.setup.SetupScreen
 import com.passgo.app.feature.unlock.UnlockScreen
+import com.passgo.app.feature.vault.AttachmentPreviewScreen
 import com.passgo.app.feature.vault.DynamicFormScreen
 import com.passgo.app.feature.vault.DynamicItemDetailScreen
 import com.passgo.app.feature.vault.VaultScreen
@@ -155,7 +156,10 @@ fun PassGoNavHost(sessionManager: SessionManager) {
                     DynamicItemDetailScreen(
                         itemId = itemId,
                         onNavigateBack = { navController.popBackStack() },
-                        onEdit = { id -> navController.navigate("vault/edit/$id") }
+                        onEdit = { id -> navController.navigate("vault/edit/$id") },
+                        onAttachmentPreview = { attachmentId ->
+                            navController.navigate("attachment-preview/$attachmentId")
+                        }
                     )
                 }
                 composable(
@@ -165,6 +169,16 @@ fun PassGoNavHost(sessionManager: SessionManager) {
                     val itemId = backStackEntry.arguments?.getString("itemId") ?: return@composable
                     DynamicFormScreen(
                         itemId = itemId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                composable(
+                    route = "attachment-preview/{attachmentId}",
+                    arguments = listOf(navArgument("attachmentId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val attachmentId = backStackEntry.arguments?.getString("attachmentId") ?: return@composable
+                    AttachmentPreviewScreen(
+                        attachmentId = attachmentId,
                         onNavigateBack = { navController.popBackStack() }
                     )
                 }
