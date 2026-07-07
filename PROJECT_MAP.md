@@ -1,7 +1,7 @@
 # PROJECT_MAP — PassGo
 
 > **Last Updated:** 2026-07-07  
-> **Status:** Milestone 4D.1 — Financial Vault Templates (Complete)  
+> **Status:** Milestone 4D.3 — Developer & Infrastructure Vault Templates (Complete)  
 > **Target Platform:** Android 16 (API 36)
 
 ---
@@ -270,6 +270,7 @@ Used as a return type for all repository operations. Callers pattern-match to ha
 | M4C | **Dynamic Vault Type Engine** (✅ Done) | FieldGroup enum, CategoryIconIdentifier, enhanced VaultItemCategory metadata, DynamicField composables, DynamicFormScreen/ViewModel, DynamicItemDetailScreen/ViewModel, dynamic navigation, zero per-type branching |
 | M4D.1 | **Financial Vault Templates** (✅ Done) | 6 financial templates (Credit Card, Debit Card, Bank Account, PayPal, Wise, Stripe), 9 new FieldIds, 10 new FieldDefinitions, 6 CategoryIconIdentifiers, 102 tests |
 | M4D.2 | **Identity & Personal Templates** (✅ Done) | 8 identity templates (Passport, National ID, Driver License, Residence Permit, Health Insurance, Social Security, Tax ID, Student ID), 13 new FieldIds, 16 new FieldDefinitions, 8 CategoryIconIdentifiers, 102→142 tests |
+| M4D.3 | **Developer & Infrastructure Templates** (✅ Done) | 8 dev/infra templates (GitHub, GitLab, Docker Hub, AWS, Azure, GCP, SSH Key, Database), 15 new FieldIds, 15 new FieldDefinitions + 2 Database field definitions, 8 CategoryIconIdentifiers, 142→176 tests |
 | M5 | **Security + Polish** (⏳ Pending) | Auto-clear clipboard, security audit, accessibility, crash reporting |
 
 ---
@@ -1163,5 +1164,74 @@ New categories assigned sort orders 19–26.
 | `compileDebugKotlin` | ✅ Zero errors, zero warnings |
 | `assembleDebug` | ✅ |
 | `testDebugUnitTest` | ✅ 142 tests pass |
+| TODO/FIXME/HACK | Zero |
+| Deprecated APIs | Zero |
+
+### Milestone 4D.3 — Developer & Infrastructure Vault Templates (✅ Complete)
+
+**Goal:** Implement 8 production-ready developer and infrastructure templates using the existing Dynamic Vault Type Engine — no new screens, ViewModels, repositories, DAOs, or navigation.
+
+#### New FieldIds (15)
+
+`ACCESS_KEY_ID`, `ACCOUNT_ID`, `AUTH_TOKEN`, `BUCKET_NAME`, `CONNECTION_STRING`, `CONTAINER_NAME`, `ORGANIZATION`, `REGION`, `REPOSITORY_NAME`, `SECRET_ACCESS_KEY`, `SERVICE_NAME`, `SSH_HOST`, `SSH_KEY_TYPE`, `SSH_PRIVATE_KEY`, `SSH_PUBLIC_KEY`
+
+#### New FieldDefinitions (17)
+
+| Definition | FieldId | InputType | Validation |
+|------------|---------|-----------|------------|
+| `AuthToken` | AUTH_TOKEN | PASSWORD | Required |
+| `Organization` | ORGANIZATION | TEXT | Optional |
+| `RepositoryName` | REPOSITORY_NAME | TEXT | Optional |
+| `ContainerName` | CONTAINER_NAME | TEXT | Optional |
+| `AccessKeyId` | ACCESS_KEY_ID | TEXT | Required |
+| `SecretAccessKey` | SECRET_ACCESS_KEY | PASSWORD | Required |
+| `Region` | REGION | TEXT | Optional |
+| `BucketName` | BUCKET_NAME | TEXT | Optional |
+| `AccountId` | ACCOUNT_ID | TEXT | Required |
+| `ServiceName` | SERVICE_NAME | TEXT | Optional |
+| `SshKeyType` | SSH_KEY_TYPE | TEXT | Optional |
+| `SshPrivateKey` | SSH_PRIVATE_KEY | PASSWORD | Required |
+| `SshPublicKey` | SSH_PUBLIC_KEY | TEXT | Optional |
+| `SshHost` | SSH_HOST | TEXT | Optional |
+| `ConnectionString` | CONNECTION_STRING | TEXT | Optional |
+| `DatabaseUsername` | DATABASE_USERNAME | TEXT | Optional |
+| `DatabasePassword` | DATABASE_PASSWORD | PASSWORD | Optional |
+
+#### New Categories (8)
+
+| Category | Sort | Fields | Required |
+|----------|------|--------|----------|
+| GITHUB | 27 | NAME, Username, Auth Token, Organization, Repository, URL, Notes | NAME, Username |
+| GITLAB | 28 | NAME, Username, Auth Token, Organization, Repository, URL, Notes | NAME, Username |
+| DOCKER_HUB | 29 | NAME, Username, Auth Token, Container Name, URL, Notes | NAME, Username |
+| AWS | 30 | NAME, Account ID, Access Key ID, Secret Access Key, Region, Bucket, Notes | NAME, Access Key ID, Secret Access Key |
+| AZURE | 31 | NAME, Account ID, Secret Access Key, Service Name, Region, Notes | NAME, Account ID, Secret Access Key |
+| GCP | 32 | NAME, Account ID, Access Key ID, Secret Access Key, Region, Bucket, Notes | NAME, Account ID |
+| SSH_KEY | 33 | NAME, Host, Key Type, Private Key, Public Key, Notes | NAME, Private Key |
+| DATABASE | 34 | NAME, Hostname, Port, Database Name, DB Username, DB Password, Connection String, Notes | NAME, Hostname, Database Name |
+
+#### New CategoryIcons (8)
+
+`GITHUB` → `Icons.Default.Code`, `GITLAB` → `Icons.Default.Code`, `DOCKER_HUB` → `Icons.Default.Cloud`, `AWS` → `Icons.Default.Cloud`, `AZURE` → `Icons.Default.Cloud`, `GCP` → `Icons.Default.Cloud`, `SSH_KEY` → `Icons.Default.VpnKey`, `DATABASE` → `Icons.Default.Storage`
+
+#### Modified Files
+
+| File | Changes |
+|------|---------|
+| `core/model/FieldId.kt` | Added 15 dev/infra identifiers (77→92 entries) |
+| `core/model/FieldDefinition.kt` | Added 17 definitions with validation, registered in `allDefinitions` (1089→1488 lines) |
+| `core/model/VaultItemCategory.kt` | Added 8 categories, sort orders 27–34 (295→351 lines) |
+| `core/model/CategoryIconIdentifier.kt` | Added 8 icon identifiers (30→38 entries) |
+| `core/ui/components/CategoryIconDisplay.kt` | Added 8 icon mappings (82→97 lines) |
+| `test/.../FieldIdTest.kt` | Added 15 name stability asserts (74→89 lines) |
+| `test/.../FieldDefinitionTest.kt` | Added 17 test classes (682→1020 lines) |
+
+#### Verification
+
+| Check | Result |
+|-------|--------|
+| `compileDebugKotlin` | ✅ Zero errors, zero warnings |
+| `assembleDebug` | ✅ |
+| `testDebugUnitTest` | ✅ 176 tests pass |
 | TODO/FIXME/HACK | Zero |
 | Deprecated APIs | Zero |

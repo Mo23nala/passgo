@@ -2,6 +2,8 @@ package com.passgo.app.core.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.ContactMail
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.CreditCard
@@ -17,11 +19,13 @@ import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +62,14 @@ fun CategoryIconIdentifier.toImageVector(): ImageVector = when (this) {
     CategoryIconIdentifier.SOCIAL_SECURITY -> Icons.Default.Lock
     CategoryIconIdentifier.TAX_ID -> Icons.Default.Receipt
     CategoryIconIdentifier.STUDENT_ID -> Icons.Default.School
+    CategoryIconIdentifier.AWS -> Icons.Default.Cloud
+    CategoryIconIdentifier.AZURE -> Icons.Default.Cloud
+    CategoryIconIdentifier.DATABASE -> Icons.Default.Storage
+    CategoryIconIdentifier.DOCKER_HUB -> Icons.Default.Cloud
+    CategoryIconIdentifier.GCP -> Icons.Default.Cloud
+    CategoryIconIdentifier.GITHUB -> Icons.Default.Code
+    CategoryIconIdentifier.GITLAB -> Icons.Default.Code
+    CategoryIconIdentifier.SSH_KEY -> Icons.Default.VpnKey
     CategoryIconIdentifier.OTHER -> Icons.Outlined.Folder
 }
 

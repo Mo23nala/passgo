@@ -281,6 +281,94 @@ enum class VaultItemCategory(
         requiredFields = listOf(FieldId.NAME, FieldId.FULL_NAME, FieldId.INSTITUTION_NAME),
         recommendedFields = listOf(FieldId.STUDENT_ID_NUMBER, FieldId.DATE_OF_BIRTH)
     ),
+    GITHUB(
+        displayName = "GitHub",
+        description = "GitHub account credentials and repository access",
+        icon = CategoryIconIdentifier.GITHUB,
+        colorArgb = 0xFF181717,
+        sortOrder = 27,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.ACCOUNT, FieldGroup.CREDENTIALS, FieldGroup.API, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.USERNAME, FieldId.AUTH_TOKEN, FieldId.ORGANIZATION, FieldId.REPOSITORY_NAME, FieldId.URL, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.USERNAME),
+        recommendedFields = listOf(FieldId.AUTH_TOKEN, FieldId.URL)
+    ),
+    GITLAB(
+        displayName = "GitLab",
+        description = "GitLab account credentials and project access",
+        icon = CategoryIconIdentifier.GITLAB,
+        colorArgb = 0xFFFC6D26,
+        sortOrder = 28,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.ACCOUNT, FieldGroup.CREDENTIALS, FieldGroup.API, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.USERNAME, FieldId.AUTH_TOKEN, FieldId.ORGANIZATION, FieldId.REPOSITORY_NAME, FieldId.URL, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.USERNAME),
+        recommendedFields = listOf(FieldId.AUTH_TOKEN, FieldId.URL)
+    ),
+    DOCKER_HUB(
+        displayName = "Docker Hub",
+        description = "Docker Hub and container registry credentials",
+        icon = CategoryIconIdentifier.DOCKER_HUB,
+        colorArgb = 0xFF2496ED,
+        sortOrder = 29,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.ACCOUNT, FieldGroup.CREDENTIALS, FieldGroup.API, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.USERNAME, FieldId.AUTH_TOKEN, FieldId.CONTAINER_NAME, FieldId.URL, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.USERNAME),
+        recommendedFields = listOf(FieldId.AUTH_TOKEN, FieldId.URL)
+    ),
+    AWS(
+        displayName = "AWS",
+        description = "Amazon Web Services access credentials",
+        icon = CategoryIconIdentifier.AWS,
+        colorArgb = 0xFFFF9900,
+        sortOrder = 30,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.ACCOUNT, FieldGroup.CREDENTIALS, FieldGroup.SERVER, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.ACCOUNT_ID, FieldId.ACCESS_KEY_ID, FieldId.SECRET_ACCESS_KEY, FieldId.REGION, FieldId.BUCKET_NAME, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.ACCESS_KEY_ID, FieldId.SECRET_ACCESS_KEY),
+        recommendedFields = listOf(FieldId.REGION, FieldId.ACCOUNT_ID)
+    ),
+    AZURE(
+        displayName = "Azure",
+        description = "Microsoft Azure service credentials",
+        icon = CategoryIconIdentifier.AZURE,
+        colorArgb = 0xFF0078D4,
+        sortOrder = 31,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.ACCOUNT, FieldGroup.CREDENTIALS, FieldGroup.SERVER, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.ACCOUNT_ID, FieldId.SECRET_ACCESS_KEY, FieldId.SERVICE_NAME, FieldId.REGION, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.ACCOUNT_ID, FieldId.SECRET_ACCESS_KEY),
+        recommendedFields = listOf(FieldId.SERVICE_NAME, FieldId.REGION)
+    ),
+    GCP(
+        displayName = "GCP",
+        description = "Google Cloud Platform service credentials",
+        icon = CategoryIconIdentifier.GCP,
+        colorArgb = 0xFF4285F4,
+        sortOrder = 32,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.ACCOUNT, FieldGroup.CREDENTIALS, FieldGroup.SERVER, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.ACCOUNT_ID, FieldId.ACCESS_KEY_ID, FieldId.SECRET_ACCESS_KEY, FieldId.REGION, FieldId.BUCKET_NAME, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.ACCOUNT_ID),
+        recommendedFields = listOf(FieldId.ACCESS_KEY_ID, FieldId.SECRET_ACCESS_KEY, FieldId.REGION)
+    ),
+    SSH_KEY(
+        displayName = "SSH Key",
+        description = "SSH key pair and connection details",
+        icon = CategoryIconIdentifier.SSH_KEY,
+        colorArgb = 0xFF212121,
+        sortOrder = 33,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.CREDENTIALS, FieldGroup.SERVER, FieldGroup.SECURITY, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.SSH_HOST, FieldId.SSH_KEY_TYPE, FieldId.SSH_PRIVATE_KEY, FieldId.SSH_PUBLIC_KEY, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.SSH_PRIVATE_KEY),
+        recommendedFields = listOf(FieldId.SSH_HOST, FieldId.SSH_KEY_TYPE)
+    ),
+    DATABASE(
+        displayName = "Database",
+        description = "Database connection configuration and credentials",
+        icon = CategoryIconIdentifier.DATABASE,
+        colorArgb = 0xFF336791,
+        sortOrder = 34,
+        groups = listOf(FieldGroup.GENERAL, FieldGroup.SERVER, FieldGroup.DATABASE, FieldGroup.CREDENTIALS, FieldGroup.NOTES),
+        fields = listOf(FieldId.NAME, FieldId.SERVER_HOSTNAME, FieldId.SERVER_PORT, FieldId.DATABASE_NAME, FieldId.DATABASE_USERNAME, FieldId.DATABASE_PASSWORD, FieldId.CONNECTION_STRING, FieldId.NOTES),
+        requiredFields = listOf(FieldId.NAME, FieldId.SERVER_HOSTNAME, FieldId.DATABASE_NAME),
+        recommendedFields = listOf(FieldId.DATABASE_USERNAME, FieldId.CONNECTION_STRING)
+    ),
     OTHER(
         displayName = "Other",
         description = "General purpose vault item",

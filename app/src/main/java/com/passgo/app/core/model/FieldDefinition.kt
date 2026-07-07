@@ -1076,6 +1076,236 @@ sealed class FieldDefinition(
         }
     }
 
+    // ── Database ─────────────────────────────────────────────
+
+    data object DatabaseUsername : FieldDefinition(
+        fieldId = FieldId.DATABASE_USERNAME,
+        label = "Database Username",
+        iconLabel = "DB User",
+        inputType = FieldInputType.TEXT,
+        maxLength = 200,
+        autofillHint = "username"
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object DatabasePassword : FieldDefinition(
+        fieldId = FieldId.DATABASE_PASSWORD,
+        label = "Database Password",
+        iconLabel = "DB Pass",
+        inputType = FieldInputType.PASSWORD,
+        maxLength = 512,
+        autofillHint = "password"
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    // ── Developer & Infrastructure ──────────────────────────
+
+    data object AuthToken : FieldDefinition(
+        fieldId = FieldId.AUTH_TOKEN,
+        label = "Auth Token",
+        iconLabel = "Token",
+        inputType = FieldInputType.PASSWORD,
+        maxLength = 512,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            if (value.isBlank()) return FieldValidationResult.Invalid("Auth token is required")
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object Organization : FieldDefinition(
+        fieldId = FieldId.ORGANIZATION,
+        label = "Organization",
+        iconLabel = "Org",
+        inputType = FieldInputType.TEXT,
+        maxLength = 200,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object RepositoryName : FieldDefinition(
+        fieldId = FieldId.REPOSITORY_NAME,
+        label = "Repository",
+        iconLabel = "Repo",
+        inputType = FieldInputType.TEXT,
+        maxLength = 200,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object ContainerName : FieldDefinition(
+        fieldId = FieldId.CONTAINER_NAME,
+        label = "Container Name",
+        iconLabel = "Container",
+        inputType = FieldInputType.TEXT,
+        maxLength = 200,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object AccessKeyId : FieldDefinition(
+        fieldId = FieldId.ACCESS_KEY_ID,
+        label = "Access Key ID",
+        iconLabel = "Key ID",
+        inputType = FieldInputType.TEXT,
+        maxLength = 128,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            if (value.isBlank()) return FieldValidationResult.Invalid("Access key ID is required")
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object SecretAccessKey : FieldDefinition(
+        fieldId = FieldId.SECRET_ACCESS_KEY,
+        label = "Secret Access Key",
+        iconLabel = "Secret",
+        inputType = FieldInputType.PASSWORD,
+        maxLength = 256,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            if (value.isBlank()) return FieldValidationResult.Invalid("Secret access key is required")
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object Region : FieldDefinition(
+        fieldId = FieldId.REGION,
+        label = "Region",
+        iconLabel = "Region",
+        inputType = FieldInputType.TEXT,
+        maxLength = 50,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object BucketName : FieldDefinition(
+        fieldId = FieldId.BUCKET_NAME,
+        label = "Bucket",
+        iconLabel = "Bucket",
+        inputType = FieldInputType.TEXT,
+        maxLength = 200,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object AccountId : FieldDefinition(
+        fieldId = FieldId.ACCOUNT_ID,
+        label = "Account ID",
+        iconLabel = "Account",
+        inputType = FieldInputType.TEXT,
+        maxLength = 128,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            if (value.isBlank()) return FieldValidationResult.Invalid("Account ID is required")
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object ServiceName : FieldDefinition(
+        fieldId = FieldId.SERVICE_NAME,
+        label = "Service Name",
+        iconLabel = "Service",
+        inputType = FieldInputType.TEXT,
+        maxLength = 200,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object SshKeyType : FieldDefinition(
+        fieldId = FieldId.SSH_KEY_TYPE,
+        label = "Key Type",
+        iconLabel = "Key Type",
+        inputType = FieldInputType.TEXT,
+        maxLength = 50,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object SshPrivateKey : FieldDefinition(
+        fieldId = FieldId.SSH_PRIVATE_KEY,
+        label = "Private Key",
+        iconLabel = "Private Key",
+        inputType = FieldInputType.PASSWORD,
+        maxLength = 8192,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            if (value.isBlank()) return FieldValidationResult.Invalid("Private key is required")
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object SshPublicKey : FieldDefinition(
+        fieldId = FieldId.SSH_PUBLIC_KEY,
+        label = "Public Key",
+        iconLabel = "Public Key",
+        inputType = FieldInputType.TEXT,
+        maxLength = 8192,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object SshHost : FieldDefinition(
+        fieldId = FieldId.SSH_HOST,
+        label = "Host",
+        iconLabel = "Host",
+        inputType = FieldInputType.TEXT,
+        maxLength = 255,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
+    data object ConnectionString : FieldDefinition(
+        fieldId = FieldId.CONNECTION_STRING,
+        label = "Connection String",
+        iconLabel = "ConnStr",
+        inputType = FieldInputType.TEXT,
+        maxLength = 1024,
+        autofillHint = null
+    ) {
+        override fun validate(value: String): FieldValidationResult {
+            return FieldValidationResult.Valid
+        }
+    }
+
     // ── Custom ───────────────────────────────────────────────
 
     data class CustomLabel(
@@ -1154,7 +1384,10 @@ sealed class FieldDefinition(
             LicenseType, LicenseRegisteredEmail, LicensePurchaseDate, LicenseExpiryDate,
             AddressLine1, AddressLine2, City, PostalCode, Country,
             PhoneNumber, PayPalEmail, SwiftBic, BankName, AccountHolder, Branch, Currency, Beneficiary, Reference,
-            ServerHostname, ServerPort,
+            ServerHostname, ServerPort, DatabaseUsername, DatabasePassword,
+            AuthToken, Organization, RepositoryName, ContainerName,
+            AccessKeyId, SecretAccessKey, Region, BucketName, AccountId, ServiceName,
+            SshKeyType, SshPrivateKey, SshPublicKey, SshHost, ConnectionString,
             CustomLabel(FieldId.CUSTOM_LABEL),
             CustomText(FieldId.CUSTOM_TEXT),
             CustomNumber(FieldId.CUSTOM_NUMBER),

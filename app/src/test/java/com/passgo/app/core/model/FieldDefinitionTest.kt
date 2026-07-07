@@ -742,6 +742,312 @@ class FieldDefinitionTest {
         }
     }
 
+    // ── AuthToken ─────────────────────────────────────────────
+
+    @Nested
+    inner class AuthTokenTest {
+
+        @Test
+        fun `valid token passes validation`() {
+            val result = FieldDefinition.AuthToken.validate("ghp_abc123def456")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `blank token fails validation`() {
+            val result = FieldDefinition.AuthToken.validate("")
+            assertInstanceOf(FieldValidationResult.Invalid::class.java, result)
+        }
+    }
+
+    // ── Organization ──────────────────────────────────────────
+
+    @Nested
+    inner class OrganizationTest {
+
+        @Test
+        fun `valid organization passes validation`() {
+            val result = FieldDefinition.Organization.validate("MyOrg")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty organization passes validation as optional`() {
+            val result = FieldDefinition.Organization.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── RepositoryName ────────────────────────────────────────
+
+    @Nested
+    inner class RepositoryNameTest {
+
+        @Test
+        fun `valid repository name passes validation`() {
+            val result = FieldDefinition.RepositoryName.validate("my-project")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty repository name passes validation as optional`() {
+            val result = FieldDefinition.RepositoryName.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── ContainerName ─────────────────────────────────────────
+
+    @Nested
+    inner class ContainerNameTest {
+
+        @Test
+        fun `valid container name passes validation`() {
+            val result = FieldDefinition.ContainerName.validate("my-app:latest")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty container name passes validation as optional`() {
+            val result = FieldDefinition.ContainerName.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── AccessKeyId ───────────────────────────────────────────
+
+    @Nested
+    inner class AccessKeyIdTest {
+
+        @Test
+        fun `valid access key ID passes validation`() {
+            val result = FieldDefinition.AccessKeyId.validate("AKIAIOSFODNN7EXAMPLE")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `blank access key ID fails validation`() {
+            val result = FieldDefinition.AccessKeyId.validate("")
+            assertInstanceOf(FieldValidationResult.Invalid::class.java, result)
+        }
+    }
+
+    // ── SecretAccessKey ───────────────────────────────────────
+
+    @Nested
+    inner class SecretAccessKeyTest {
+
+        @Test
+        fun `valid secret key passes validation`() {
+            val result = FieldDefinition.SecretAccessKey.validate("wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `blank secret key fails validation`() {
+            val result = FieldDefinition.SecretAccessKey.validate("")
+            assertInstanceOf(FieldValidationResult.Invalid::class.java, result)
+        }
+    }
+
+    // ── Region ─────────────────────────────────────────────────
+
+    @Nested
+    inner class RegionTest {
+
+        @Test
+        fun `valid region passes validation`() {
+            val result = FieldDefinition.Region.validate("us-east-1")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty region passes validation as optional`() {
+            val result = FieldDefinition.Region.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── BucketName ────────────────────────────────────────────
+
+    @Nested
+    inner class BucketNameTest {
+
+        @Test
+        fun `valid bucket name passes validation`() {
+            val result = FieldDefinition.BucketName.validate("my-bucket")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty bucket name passes validation as optional`() {
+            val result = FieldDefinition.BucketName.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── AccountId ─────────────────────────────────────────────
+
+    @Nested
+    inner class AccountIdTest {
+
+        @Test
+        fun `valid account ID passes validation`() {
+            val result = FieldDefinition.AccountId.validate("123456789012")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `blank account ID fails validation`() {
+            val result = FieldDefinition.AccountId.validate("")
+            assertInstanceOf(FieldValidationResult.Invalid::class.java, result)
+        }
+    }
+
+    // ── ServiceName ───────────────────────────────────────────
+
+    @Nested
+    inner class ServiceNameTest {
+
+        @Test
+        fun `valid service name passes validation`() {
+            val result = FieldDefinition.ServiceName.validate("my-app-service")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty service name passes validation as optional`() {
+            val result = FieldDefinition.ServiceName.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── SshKeyType ────────────────────────────────────────────
+
+    @Nested
+    inner class SshKeyTypeTest {
+
+        @Test
+        fun `valid key type passes validation`() {
+            val result = FieldDefinition.SshKeyType.validate("Ed25519")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty key type passes validation as optional`() {
+            val result = FieldDefinition.SshKeyType.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── SshPrivateKey ─────────────────────────────────────────
+
+    @Nested
+    inner class SshPrivateKeyTest {
+
+        @Test
+        fun `valid private key passes validation`() {
+            val result = FieldDefinition.SshPrivateKey.validate("-----BEGIN OPENSSH PRIVATE KEY-----\nabc123\n-----END OPENSSH PRIVATE KEY-----")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `blank private key fails validation`() {
+            val result = FieldDefinition.SshPrivateKey.validate("")
+            assertInstanceOf(FieldValidationResult.Invalid::class.java, result)
+        }
+    }
+
+    // ── SshPublicKey ──────────────────────────────────────────
+
+    @Nested
+    inner class SshPublicKeyTest {
+
+        @Test
+        fun `valid public key passes validation`() {
+            val result = FieldDefinition.SshPublicKey.validate("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI...")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty public key passes validation as optional`() {
+            val result = FieldDefinition.SshPublicKey.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── SshHost ───────────────────────────────────────────────
+
+    @Nested
+    inner class SshHostTest {
+
+        @Test
+        fun `valid host passes validation`() {
+            val result = FieldDefinition.SshHost.validate("example.com")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty host passes validation as optional`() {
+            val result = FieldDefinition.SshHost.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── ConnectionString ──────────────────────────────────────
+
+    @Nested
+    inner class ConnectionStringTest {
+
+        @Test
+        fun `valid connection string passes validation`() {
+            val result = FieldDefinition.ConnectionString.validate("postgresql://user:pass@localhost:5432/mydb")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty connection string passes validation as optional`() {
+            val result = FieldDefinition.ConnectionString.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── DatabaseUsername ──────────────────────────────────────
+
+    @Nested
+    inner class DatabaseUsernameTest {
+
+        @Test
+        fun `valid DB username passes validation`() {
+            val result = FieldDefinition.DatabaseUsername.validate("db_admin")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty DB username passes validation as optional`() {
+            val result = FieldDefinition.DatabaseUsername.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
+    // ── DatabasePassword ──────────────────────────────────────
+
+    @Nested
+    inner class DatabasePasswordTest {
+
+        @Test
+        fun `valid DB password passes validation`() {
+            val result = FieldDefinition.DatabasePassword.validate("s3cur3Pass!")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+
+        @Test
+        fun `empty DB password passes validation as optional`() {
+            val result = FieldDefinition.DatabasePassword.validate("")
+            assertInstanceOf(FieldValidationResult.Valid::class.java, result)
+        }
+    }
+
     // ── FieldDefinition.lookup ───────────────────────────────
 
     @Nested

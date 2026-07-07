@@ -54,6 +54,21 @@ class FieldIdTest {
         assertEquals("POLICY_NUMBER", FieldId.POLICY_NUMBER.name)
         assertEquals("STUDENT_ID_NUMBER", FieldId.STUDENT_ID_NUMBER.name)
         assertEquals("INSTITUTION_NAME", FieldId.INSTITUTION_NAME.name)
+        assertEquals("ACCESS_KEY_ID", FieldId.ACCESS_KEY_ID.name)
+        assertEquals("ACCOUNT_ID", FieldId.ACCOUNT_ID.name)
+        assertEquals("AUTH_TOKEN", FieldId.AUTH_TOKEN.name)
+        assertEquals("BUCKET_NAME", FieldId.BUCKET_NAME.name)
+        assertEquals("CONNECTION_STRING", FieldId.CONNECTION_STRING.name)
+        assertEquals("CONTAINER_NAME", FieldId.CONTAINER_NAME.name)
+        assertEquals("ORGANIZATION", FieldId.ORGANIZATION.name)
+        assertEquals("REGION", FieldId.REGION.name)
+        assertEquals("REPOSITORY_NAME", FieldId.REPOSITORY_NAME.name)
+        assertEquals("SECRET_ACCESS_KEY", FieldId.SECRET_ACCESS_KEY.name)
+        assertEquals("SERVICE_NAME", FieldId.SERVICE_NAME.name)
+        assertEquals("SSH_HOST", FieldId.SSH_HOST.name)
+        assertEquals("SSH_KEY_TYPE", FieldId.SSH_KEY_TYPE.name)
+        assertEquals("SSH_PRIVATE_KEY", FieldId.SSH_PRIVATE_KEY.name)
+        assertEquals("SSH_PUBLIC_KEY", FieldId.SSH_PUBLIC_KEY.name)
     }
 
     @Test

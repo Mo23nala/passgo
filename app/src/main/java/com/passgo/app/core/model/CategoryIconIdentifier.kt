@@ -26,5 +26,13 @@ enum class CategoryIconIdentifier {
     SOCIAL_SECURITY,
     TAX_ID,
     STUDENT_ID,
+    AWS,
+    AZURE,
+    DATABASE,
+    DOCKER_HUB,
+    GCP,
+    GITHUB,
+    GITLAB,
+    SSH_KEY,
     OTHER
 }
