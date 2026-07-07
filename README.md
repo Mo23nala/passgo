@@ -2,8 +2,9 @@
 
 A professional Android password manager with encrypted local storage.
 
->*Status:* Milestone 4D — Advanced Search & Attachments ✅ Complete
->*Target:* Android 16 (API 36), APK distribution
+> **Status:** Milestone 4D.3 — Developer & Infrastructure Vault Templates (Complete)
+> **Target:** Android 16 (API 36), APK distribution
+
 ## Architecture
 
 Feature-first, single-module Android app built with:
@@ -82,10 +83,7 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | Reusable FieldDefinition validation engine | ✅ |
 | Dynamic category rendering | ✅ |
 | Generic custom field architecture | ✅ |
-| Full-Text Search (FTS4)	✅ |
-| Search History & Suggestions	✅ |
-| Encrypted File Attachments	✅ |
-| Attachment Preview	✅ |
+
 ## Screens
 
 | Screen | Route | Description |
@@ -141,9 +139,9 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 
 | Feature | Status |
 |---|---|
-| Advanced Search & Attachments | ✅ Pending |
-| Full-text search improvements | ✅ Pending |
-| Encrypted file attachments | ✅ Pending |
+| Advanced Search & Attachments | ⏳ Pending |
+| Full-text search improvements | ⏳ Pending |
+| Encrypted file attachments | ⏳ Pending |
 | Clipboard security (auto-clear) | ⏳ Pending |
 | Security audit & hardening | ⏳ Pending |
 | Backup / restore | ⏳ Pending |
