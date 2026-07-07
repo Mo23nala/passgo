@@ -185,6 +185,8 @@ fun DynamicItemDetailScreen(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                 }
             }
+
+            AttachmentSection(itemId = vaultItem.id)
         }
     }
 
