@@ -27,7 +27,7 @@ class DatasetBuilder @Inject constructor() {
 
         val menuPresentation = createPresentation(credential)
 
-        val dataset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val dataset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val builder = Presentations.Builder()
             builder.setMenuPresentation(menuPresentation)
             Dataset.Builder(builder.build())
