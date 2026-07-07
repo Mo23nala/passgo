@@ -53,7 +53,7 @@ There are no per-category composables, ViewModels, or navigation routes. The `Dy
 | Logging infrastructure | ✅ |
 | Error handling (AppResult) | ✅ |
 | Vault item list with search, sort, filter | ✅ |
-| Add/dit vault items with category & folder | ✅ |
+| Add/edit vault items with category & folder | ✅ |
 | Password generation (crypto-strong) | ✅ |
 | Password strength indicator | ✅ |
 | Item detail with copy, show/hide, open URL | ✅ |
