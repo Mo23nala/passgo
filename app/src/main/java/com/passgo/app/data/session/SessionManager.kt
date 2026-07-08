@@ -1,6 +1,8 @@
 package com.passgo.app.data.session
 
 import com.passgo.app.core.logging.PassGoLogger
+import com.passgo.app.core.security.KeyStoreManager
+import com.passgo.app.core.security.MasterKeyManager
 import com.passgo.app.core.security.MasterPasswordStore
 import com.passgo.app.data.settings.FailedAttemptStore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +15,9 @@ import javax.inject.Singleton
 class SessionManager @Inject constructor(
     private val logger: PassGoLogger,
     private val passwordStore: MasterPasswordStore,
-    private val failedAttemptStore: FailedAttemptStore
+    private val failedAttemptStore: FailedAttemptStore,
+    private val masterKeyManager: MasterKeyManager,
+    private val keyStoreManager: KeyStoreManager
 ) {
 
     private val _sessionState = MutableStateFlow(
@@ -70,6 +74,8 @@ class SessionManager @Inject constructor(
         _sessionState.value = SessionState.LOCKED
         unlockedSince = 0L
         autofillSessionUnlock = false
+        masterKeyManager.clearOnLock()
+        keyStoreManager.clearCache()
     }
 
     fun lockIfAutofillOnly() {

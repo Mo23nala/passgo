@@ -59,6 +59,7 @@ abstract class PassGoDatabase : RoomDatabase() {
                     val sqlCipherFactory = SupportOpenHelperFactory(passphrase)
                     val helper = sqlCipherFactory.create(configuration)
                     helper.writableDatabase.execSQL(SQLCIPHER_OPTIONS)
+                    passphrase.fill(0)
                     return helper
                 }
             }
@@ -72,6 +73,8 @@ abstract class PassGoDatabase : RoomDatabase() {
                 .addMigrations(*DatabaseMigrations.ALL_MIGRATIONS)
                 .build()
         }
+
+
 
         fun buildInMemory(context: Context, passphrase: ByteArray): PassGoDatabase {
             val factory = SupportOpenHelperFactory(passphrase)

@@ -4,6 +4,7 @@ import android.content.Context
 import com.passgo.app.core.logging.PassGoLogger
 import com.passgo.app.core.security.AttachmentManager
 import com.passgo.app.core.security.KeyStoreManager
+import com.passgo.app.core.security.MasterKeyManager
 import com.passgo.app.core.security.MasterPasswordStore
 import com.passgo.app.data.session.SessionManager
 import com.passgo.app.data.settings.FailedAttemptStore
@@ -29,9 +30,11 @@ object AppModule {
     fun provideSessionManager(
         logger: PassGoLogger,
         passwordStore: MasterPasswordStore,
-        failedAttemptStore: FailedAttemptStore
+        failedAttemptStore: FailedAttemptStore,
+        masterKeyManager: MasterKeyManager,
+        keyStoreManager: KeyStoreManager
     ): SessionManager {
-        return SessionManager(logger, passwordStore, failedAttemptStore)
+        return SessionManager(logger, passwordStore, failedAttemptStore, masterKeyManager, keyStoreManager)
     }
 
     @Provides
