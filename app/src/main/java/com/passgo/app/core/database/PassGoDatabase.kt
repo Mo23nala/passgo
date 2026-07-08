@@ -78,12 +78,14 @@ abstract class PassGoDatabase : RoomDatabase() {
 
         fun buildInMemory(context: Context, passphrase: ByteArray): PassGoDatabase {
             val factory = SupportOpenHelperFactory(passphrase)
-            return Room.inMemoryDatabaseBuilder(
+            val db = Room.inMemoryDatabaseBuilder(
                 context.applicationContext,
                 PassGoDatabase::class.java
             )
                 .openHelperFactory(factory)
                 .build()
+            passphrase.fill(0)
+            return db
         }
     }
 }
