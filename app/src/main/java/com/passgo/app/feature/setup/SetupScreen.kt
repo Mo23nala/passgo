@@ -22,10 +22,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.passgo.app.R
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.passgo.app.core.security.PasswordValidator
 
@@ -54,7 +56,7 @@ fun SetupScreen(
         Spacer(modifier = Modifier.height(48.dp))
 
         Text(
-            "Create Master Password",
+            stringResource(R.string.create_vault),
             style = MaterialTheme.typography.headlineMedium
         )
 
@@ -71,7 +73,7 @@ fun SetupScreen(
         OutlinedTextField(
             value = password,
             onValueChange = viewModel::onPasswordChanged,
-            label = { Text("Master Password") },
+            label = { Text(stringResource(R.string.master_password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -87,7 +89,7 @@ fun SetupScreen(
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = viewModel::onConfirmPasswordChanged,
-            label = { Text("Confirm Password") },
+            label = { Text(stringResource(R.string.confirm_password)) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -137,7 +139,7 @@ fun SetupScreen(
             enabled = password.isNotEmpty() && confirmPassword.isNotEmpty() && viewModel.passwordsMatch(),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Create Vault")
+            Text(stringResource(R.string.create_vault))
         }
     }
 }

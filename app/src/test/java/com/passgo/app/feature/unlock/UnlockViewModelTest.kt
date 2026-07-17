@@ -7,6 +7,8 @@ import com.passgo.app.core.security.PasswordHasher
 import com.passgo.app.core.security.SecurityEventLogger
 import com.passgo.app.data.session.SessionManager
 import com.passgo.app.data.settings.FailedAttemptStore
+import com.passgo.app.feature.autofill.auth.BiometricAuthManager
+import com.passgo.app.core.security.MasterKeyManager
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -39,6 +41,8 @@ class UnlockViewModelTest {
     private lateinit var sessionManager: SessionManager
     private lateinit var failedAttemptStore: FailedAttemptStore
     private lateinit var securityEventLogger: SecurityEventLogger
+    private lateinit var biometricAuthManager: BiometricAuthManager
+    private lateinit var masterKeyManager: MasterKeyManager
     private lateinit var logger: PassGoLogger
     private lateinit var viewModel: UnlockViewModel
 
@@ -51,9 +55,12 @@ class UnlockViewModelTest {
         failedAttemptStore = mockk()
         securityEventLogger = mockk()
         logger = mockk(relaxed = true)
+        biometricAuthManager = mockk(relaxed = true)
+        masterKeyManager = mockk(relaxed = true)
 
         every { sessionManager.isLockedOut() } returns false
         every { sessionManager.remainingLockoutTime() } returns 0L
+        every { biometricAuthManager.isBiometricAvailable() } returns BiometricAuthManager.BiometricAvailability.AVAILABLE
         coEvery { securityEventLogger.logEvent(any()) } just Runs
     }
 
@@ -69,7 +76,9 @@ class UnlockViewModelTest {
             sessionManager = sessionManager,
             failedAttemptStore = failedAttemptStore,
             securityEventLogger = securityEventLogger,
-            logger = logger
+            logger = logger,
+            biometricAuthManager = biometricAuthManager,
+            masterKeyManager = masterKeyManager
         )
     }
 

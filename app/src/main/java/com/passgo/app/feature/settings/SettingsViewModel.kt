@@ -2,9 +2,12 @@ package com.passgo.app.feature.settings
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.passgo.app.core.database.BackupManager
+import com.passgo.app.core.error.AppResult
 import com.passgo.app.core.logging.PassGoLogger
 import com.passgo.app.data.settings.ThemeMode
 import com.passgo.app.data.settings.UserPreferences
@@ -20,7 +23,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val userPreferences: UserPreferences,
     private val logger: PassGoLogger,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val backupManager: BackupManager
 ) : ViewModel() {
 
     val themeMode: StateFlow<ThemeMode> = userPreferences.themeMode
@@ -63,6 +67,24 @@ class SettingsViewModel @Inject constructor(
     fun setClipboardClearDelayMs(delayMs: Long) {
         viewModelScope.launch {
             userPreferences.setClipboardClearDelayMs(delayMs)
+        }
+    }
+
+    fun exportDatabase(uri: Uri, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            when (val result = backupManager.exportDatabase(uri)) {
+                is AppResult.Success -> onResult(true, null)
+                is AppResult.Error -> onResult(false, result.exception.message)
+            }
+        }
+    }
+
+    fun importDatabase(uri: Uri, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            when (val result = backupManager.importDatabase(uri)) {
+                is AppResult.Success -> onResult(true, null)
+                is AppResult.Error -> onResult(false, result.exception.message)
+            }
         }
     }
 }

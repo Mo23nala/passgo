@@ -2,6 +2,7 @@ package com.passgo.app.feature.autofill.dataset
 
 import android.os.Build
 import android.service.autofill.Dataset
+import android.service.autofill.Field
 import android.service.autofill.Presentations
 import android.service.autofill.SaveInfo
 import android.view.autofill.AutofillId
@@ -38,17 +39,35 @@ class DatasetBuilder @Inject constructor() {
 
         usernameField?.let { field ->
             if (credential.username.isNotEmpty()) {
-                setDatasetValue(dataset, field.autofillId, AutofillValue.forText(credential.username))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val b = Presentations.Builder().setMenuPresentation(menuPresentation).build()
+                    val f = Field.Builder().setPresentations(b).setValue(AutofillValue.forText(credential.username)).build()
+                    dataset.setField(field.autofillId, f)
+                } else {
+                    setDatasetValue(dataset, field.autofillId, AutofillValue.forText(credential.username))
+                }
             }
         }
 
         emailField?.let { field ->
             if (credential.email.isNotEmpty()) {
-                setDatasetValue(dataset, field.autofillId, AutofillValue.forText(credential.email))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val b = Presentations.Builder().setMenuPresentation(menuPresentation).build()
+                    val f = Field.Builder().setPresentations(b).setValue(AutofillValue.forText(credential.email)).build()
+                    dataset.setField(field.autofillId, f)
+                } else {
+                    setDatasetValue(dataset, field.autofillId, AutofillValue.forText(credential.email))
+                }
             }
         }
 
-        setDatasetValue(dataset, passwordField.autofillId, AutofillValue.forText(credential.password))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val b = Presentations.Builder().setMenuPresentation(menuPresentation).build()
+            val f = Field.Builder().setPresentations(b).setValue(AutofillValue.forText(credential.password)).build()
+            dataset.setField(passwordField.autofillId, f)
+        } else {
+            setDatasetValue(dataset, passwordField.autofillId, AutofillValue.forText(credential.password))
+        }
 
         return dataset.build()
     }
@@ -76,6 +95,11 @@ class DatasetBuilder @Inject constructor() {
         ).apply {
             if (optionalIds.isNotEmpty()) {
                 setOptionalIds(optionalIds.toTypedArray())
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                setDescription("Save this password to your PassGo vault.")
+            } else {
+                setDescription("Save password to PassGo")
             }
         }.build()
     }

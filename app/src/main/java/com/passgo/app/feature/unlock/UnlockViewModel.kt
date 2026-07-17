@@ -9,6 +9,8 @@ import com.passgo.app.core.security.PasswordHasher
 import com.passgo.app.core.security.SecurityEventLogger
 import com.passgo.app.data.session.SessionManager
 import com.passgo.app.data.settings.FailedAttemptStore
+import com.passgo.app.feature.autofill.auth.BiometricAuthManager
+import com.passgo.app.core.security.MasterKeyManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,7 +30,9 @@ class UnlockViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val failedAttemptStore: FailedAttemptStore,
     private val securityEventLogger: SecurityEventLogger,
-    private val logger: PassGoLogger
+    private val logger: PassGoLogger,
+    private val biometricAuthManager: BiometricAuthManager,
+    private val masterKeyManager: MasterKeyManager
 ) : ViewModel() {
 
     private val _password = MutableStateFlow("")
@@ -43,7 +47,14 @@ class UnlockViewModel @Inject constructor(
     private val _lockoutSecondsRemaining = MutableStateFlow(0)
     val lockoutSecondsRemaining: StateFlow<Int> = _lockoutSecondsRemaining.asStateFlow()
 
+    private val _isBiometricAvailable = MutableStateFlow(false)
+    val isBiometricAvailable: StateFlow<Boolean> = _isBiometricAvailable.asStateFlow()
+
     private var lockoutJob: Job? = null
+
+    init {
+        _isBiometricAvailable.value = biometricAuthManager.isBiometricAvailable() == BiometricAuthManager.BiometricAvailability.AVAILABLE
+    }
 
     fun onPasswordChanged(value: String) {
         _password.value = value
@@ -104,6 +115,27 @@ class UnlockViewModel @Inject constructor(
                 _isUnlocked.emit(false)
             }
         }
+    }
+
+    fun unlockWithBiometricSuccess() {
+        viewModelScope.launch {
+            try {
+                masterKeyManager.getOrCreateMasterKey()
+                sessionManager.notifySuccessfulUnlock()
+                sessionManager.unlock()
+                securityEventLogger.logEvent(EventType.UNLOCK_SUCCESS)
+                logger.info("UnlockViewModel", "Vault unlocked successfully via biometrics")
+                _isUnlocked.emit(true)
+            } catch (e: Exception) {
+                logger.error("UnlockViewModel", "Biometric unlock failed: ${e.message}")
+                _error.value = "Biometric unlock failed"
+                _isUnlocked.emit(false)
+            }
+        }
+    }
+
+    fun onBiometricError(errorMsg: String) {
+        _error.value = errorMsg
     }
 
     private fun showLockoutState() {
