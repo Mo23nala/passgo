@@ -6,3 +6,7 @@ local.properties
 .idea/
 .DS_Store
 captures/
+keystore.properties
+release.keystore
+*.jks
+*.keystore
