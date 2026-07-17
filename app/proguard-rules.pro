@@ -29,3 +29,10 @@
 
 # Keep SQLCipher classes used via reflection in Room
 -keep class net.zetetic.database.sqlcipher.** { *; }
+
+# Autofill structures often need reflection / aren't safely minified depending on the View structures
+-keep class android.service.autofill.** { *; }
+
+# Keep Coroutines
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}

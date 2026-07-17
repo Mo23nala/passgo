@@ -52,6 +52,12 @@ class BackupManager @Inject constructor(
                     inputStream.copyTo(outputStream)
                 }
 
+                // For SQLCipher, the header is obfuscated, but we can verify it's not empty
+                if (tempFile.length() < 1024) {
+                    tempFile.delete()
+                    throw AppException.UnknownException("Invalid backup file: File is too small.")
+                }
+
                 // Backup current database just in case
                 if (dbFile.exists()) {
                     val backupFile = File(context.cacheDir, "db_backup.db")
